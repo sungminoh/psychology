@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import CountdownTimer from '../CountdownTimer';
 import InputForm from './InputForm'
-import Score from './Score';
 import Result from './Result';
 import ColorGrid from './ColorGrid';
 import ResponseButton from './ResponseButton';

@@ -36,7 +36,8 @@ var ColorGrid = React.createClass({
     return(
       <Grid
         style={{
-          height: specs.height,
+          minHeight: specs.height,
+          minWidth: specs.width,
           paddingTop: verticalPadding,
           paddingBottom: verticalPadding,
           paddingLeft: horizentalPadding,
