@@ -1,12 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import fetch from 'whatwg-fetch';
 import { Button } from 'react-bootstrap';
 import { Router, Route, browserHistory, IndexRoute, Link } from 'react-router';
 import App1 from './app1/App1';
 import App2 from './app2/App2';
 import { makeUrl } from './helpers';
 import { base } from './config';
-import Game from './app2/Game';
+import Game from './app1/Game';
 
 
 function Index(props){
@@ -16,11 +17,17 @@ function Index(props){
 
 var Selector = React.createClass({
   handleClick(e){
-    if(e.target.id == 1){
+    var id = e.target.id;
+    if(id == 1){
         this.props.router.push({ pathname: makeUrl('/app1') });
-    }else{
+    }else if(id == 2){
         this.props.router.push({ pathname: makeUrl('/app2') });
+    }else if(id == 3){
+        this.props.router.push({ pathname: makeUrl('/app3') });
+    }else if(id == 4){
+        this.props.router.push({ pathname: makeUrl('/app4') });
     }
+
   },
   render(){
     const wellStyles = {
@@ -31,10 +38,16 @@ var Selector = React.createClass({
     return (
       <div className="well" style={wellStyles}>
         <Button id={1} bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
-          타겟 맞추기
+          Visual Working Memory
         </Button>
         <Button id={2} bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
-          전화번호 누르기
+          Mental Rotation
+        </Button>
+        <Button id={3} bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
+          Task Switching
+        </Button>
+        <Button id={4} bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
+          Stop Sginal Task
         </Button>
       </div>
     )

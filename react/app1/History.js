@@ -10,15 +10,10 @@ var TableRow = React.createClass({
     return (
       <tr>
         <td>{this.props.idx}</td>
-        <td>{this.props.target_x}</td>
-        <td>{this.props.target_y}</td>
-        <td>{this.props.target_r}</td>
-        <td>{this.props.touch_x}</td>
-        <td>{this.props.touch_y}</td>
-        <td>{this.props.touch_s}</td>
-        <td>{this.props.touch_d}</td>
-        <td>{this.props.accuracy}</td>
-        <td>{this.props.delay}</td>
+        <td>{this.props.boxes}</td>
+        <td>{this.props.changed}</td>
+        <td>{this.props.userInput}</td>
+        <td>{this.props.correct}</td>
         <td>{dateText}</td>
       </tr>
     )
@@ -34,16 +29,11 @@ function  getList(data){
       <TableRow
         key={i+1}
         idx={row[0]}
-        target_x={row[1]}
-        target_y={row[2]}
-        target_r={row[3]}
-        touch_x={row[4]}
-        touch_y={row[5]}
-        touch_s={row[6]}
-        touch_d={row[7]}
-        accuracy={row[8]}
-        delay={row[9]}
-        ts={row[10]}
+        boxes={row[1]}
+        changed={row[2]}
+        userInput={row[3]}
+        correct={row[4]}
+        ts={row[5]}
       />
     )
   }
@@ -99,15 +89,10 @@ var History = React.createClass({
           <thead>
             <tr>
               <th>실험 번호</th>
-              <th>타겟 x</th>
-              <th>타겟 y</th>
-              <th>타겟 r</th>
-              <th>터치 x</th>
-              <th>터치 y</th>
-              <th>터치 크기</th>
-              <th>터치 시간</th>
-              <th>오차</th>
-              <th>반응 시간</th>
+              <th>박스 개수</th>
+              <th>변화</th>
+              <th>응답</th>
+              <th>정답</th>
               <th>실험 시각</th>
             </tr>
           </thead>

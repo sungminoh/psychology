@@ -7,11 +7,10 @@ var TableRow = React.createClass({
     return (
       <tr>
         <td>{this.props.idx}</td>
-        <td>{this.props.delay.toFixed(2)}</td>
-        <td>{this.props.touchDuration.toFixed(2)}</td>
-        <td>{this.props.touchSize.toFixed(2)}</td>
-        <td>{this.props.accuracy.toFixed(2)}</td>
-        <td>{this.props.targetRadius.toFixed(2)}</td>
+        <td>{this.props.numberOfBoxes}</td>
+        <td>{this.props.gameAnswer}</td>
+        <td>{this.props.userAnswer}</td>
+        <td>{this.props.correct}</td>
       </tr>
     );
   }
@@ -20,7 +19,12 @@ var TableRow = React.createClass({
 function average(arr){
   var sum = 0;
   for(var i=0; i<arr.length; i++){
-    sum += parseFloat(arr[i]);
+    var parsed = parseFloat(arr[i]);
+    if(isNaN(parsed)){
+      sum += arr[i].toString() == 'true' ? 1 : 0;
+    }else if (typeof(parsed) == 'number'){
+      sum += parseFloat(parsed);
+    }
   }
   return sum/arr.length;
 }
@@ -33,48 +37,53 @@ var Result = React.createClass({
   },
 
   propTypes: {
-    targetPositions: React.PropTypes.array,
-    targetRadii: React.PropTypes.array,
-    touches: React.PropTypes.array,
-    touchSizes: React.PropTypes.array,
-    touchDurations: React.PropTypes.array,
-    accuracies: React.PropTypes.array,
-    delays : React.PropTypes.array,
-    count: React.PropTypes.number,
+    gameBoxSeq: React.PropTypes.array,
+    gameAnswers: React.PropTypes.array,
+    userAnswers: React.PropTypes.array,
     reset: React.PropTypes.func
   },
-
+  componentWillMount(){
+    this.componentWillReceiveProps(this.props);
+  },
+  componentWillReceiveProps(nextProps){
+    this.corrects = [];
+    for(var i=0; i<nextProps.gameAnswers.length; i++){
+      if(nextProps.gameAnswers[i] == nextProps.userAnswers[i]){
+        this.corrects.push(1);
+      }else{
+        this.corrects.push(0);
+      }
+    }
+  },
   getAvergeTr(){
-    var avgOfDelays = average(this.props.delays);
-    var avgOfTouchDuration = average(this.props.touchDurations);
-    var avgOfTouchSize = average(this.props.touchSizes);
-    var avgOfAccuracies = average(this.props.accuracies);
-    var avgOfTargetRadii = average(this.props.targetRadii);
+    var avgOfBoxes = average(this.props.gameBoxSeq);
+    var avgOfGameAnswer = average(this.props.gameAnswers);
+    var avgOfUserAnswer = average(this.props.userAnswers);
+    var corrects = this.corrects.reduce((a, b) => a + b, 0);
+    var avgOfCorrects = corrects / this.corrects.length;
 
     return (
       <TableRow
         idx='avg.'
-        delay={avgOfDelays}
-        touchDuration={avgOfTouchDuration}
-        touchSize={avgOfTouchSize}
-        accuracy={avgOfAccuracies}
-        targetRadius={avgOfTargetRadii}
+        numberOfBoxes={avgOfBoxes.toFixed(2)}
+        gameAnswer={avgOfGameAnswer.toFixed(2)}
+        userAnswer={avgOfUserAnswer.toFixed(2)}
+        correct={avgOfCorrects.toFixed(2)}
       />
     )
   },
 
   getList(){
     var ret = [];
-    for (var i=0; i<this.props.count; i++){
+    for (var i=0; i<this.corrects.length; i++){
       ret.push(
         <TableRow
           key={i+1}
           idx={i+1}
-          delay={this.props.delays[i]}
-          touchDuration={this.props.touchDurations[i]}
-          touchSize={this.props.touchSizes[i]}
-          accuracy={this.props.accuracies[i]}
-          targetRadius={this.props.targetRadii[i]}
+          numberOfBoxes={this.props.gameBoxSeq[i]}
+          gameAnswer={this.props.gameAnswers[i]}
+          userAnswer={this.props.userAnswers[i]}
+          correct={this.corrects[i] ? 'O' : 'X'}
         />
       )
     }
@@ -93,11 +102,10 @@ var Result = React.createClass({
             <thead>
               <tr>
                 <th>#</th>
-                <th>반응시간</th>
-                <th>터치시간</th>
-                <th>터치크기</th>
-                <th>오차</th>
-                <th>반지름</th>
+                <th>상자수</th>
+                <th>정답</th>
+                <th>입력</th>
+                <th>정오</th>
               </tr>
             </thead>
             <tbody>
@@ -116,13 +124,19 @@ var Result = React.createClass({
   },
 
   sendResult(){
+    var obj = {
+      gameBoxSeq: this.props.gameBoxSeq,
+      gameAnswers: this.props.gameAnswers,
+      userAnswers: this.props.userAnswers,
+      corrects: this.corrects
+    }
     var requestHeader = {
       method: 'POST',
       headers: {
         //'Accept': 'application/json, application/xml, text/play, text/html, *.*',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(this.props)
+      body: JSON.stringify(obj)
     }
     fetch(makeUrl('/app1/result'), requestHeader)
       .then((response) => {
