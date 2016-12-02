@@ -99,6 +99,9 @@ var Game = React.createClass({
         gameAnswers={this.gameAnswers}
         userAnswers={this.userAnswers}
         reset={this.resetComponent}
+        expose={this.state.expose}
+        blink={this.state.blink}
+        interval={this.state.interval}
       />
     );
   },

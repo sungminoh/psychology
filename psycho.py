@@ -65,20 +65,25 @@ def app1Result():
         game_answers = request_data['gameAnswers']
         user_answers = request_data['userAnswers']
         corrects = request_data['corrects']
+        expose = request_data['expose']
+        blink = request_data['blink']
+        interval = request_data['interval']
         test_id = get_test_id('app1')
         data = [(test_id,
-                 game_box_seq[i], game_answers[i],
-                 user_answers[i], corrects[i])
+                 game_box_seq[i], game_answers[i], user_answers[i], corrects[i],
+                 expose, blink, interval)
                 for i in range(len(game_box_seq))]
         query = ('INSERT INTO app1 '
-                 '(test_id, boxes, is_changed, user_input, correct) '
-                 'VALUES (%s, %s, %s, %s, %s) ')
+                 '(test_id, boxes, is_changed, user_input, correct, '
+                 'expose, blink, inter) '
+                 'VALUES (%s, %s, %s, %s, %s, %s, %s, %s)')
         g.db.cursor().executemany(query, data)
         g.db.commit()
         return jsonify(result='success')
     elif request.method == 'GET':
         query = ('SELECT '
-                 'test_id, boxes, is_changed, user_input, correct, ts '
+                 'test_id, boxes, is_changed, user_input, correct, '
+                 'expose, blink, inter, ts '
                  'FROM app1 ')
         data = fetch_data(query)
         return jsonify(result=data)
@@ -95,10 +100,12 @@ def app1Download():
         current_time_string = time.strftime('%Y-%m-%d %H:%M:%S')
         filename = ('app1(%s)' % current_time_string) + '.csv'
 
-        header = ['test_id', 'number_of_boxes', 'is_changed',
-                  'user_input', 'is_correct', 'timestamp']
+        header = ['test_id',
+                  'number_of_boxes', 'is_changed', 'user_input', 'is_correct',
+                  'expose', 'blink', 'inter', 'timestamp']
         query = ('SELECT '
-                 'test_id, boxes, is_changed, user_input, correct, ts '
+                 'test_id, boxes, is_changed, user_input, correct, '
+                 'expose, blink, inter, ts '
                  'FROM app1 ')
         data = fetch_data(query)
         csvData = [','.join(header)]

@@ -128,7 +128,10 @@ var Result = React.createClass({
       gameBoxSeq: this.props.gameBoxSeq,
       gameAnswers: this.props.gameAnswers,
       userAnswers: this.props.userAnswers,
-      corrects: this.corrects
+      corrects: this.corrects,
+      expose: this.props.expose,
+      blink: this.props.blink,
+      interval: this.props.interval
     }
     var requestHeader = {
       method: 'POST',

@@ -14,6 +14,9 @@ var TableRow = React.createClass({
         <td>{this.props.changed}</td>
         <td>{this.props.userInput}</td>
         <td>{this.props.correct}</td>
+        <td>{this.props.expose}</td>
+        <td>{this.props.blink}</td>
+        <td>{this.props.interval}</td>
         <td>{dateText}</td>
       </tr>
     )
@@ -33,7 +36,10 @@ function  getList(data){
         changed={row[2]}
         userInput={row[3]}
         correct={row[4]}
-        ts={row[5]}
+        expose={row[5]}
+        blink={row[6]}
+        interval={row[7]}
+        ts={row[8]}
       />
     )
   }
@@ -93,6 +99,9 @@ var History = React.createClass({
               <th>변화</th>
               <th>응답</th>
               <th>정답</th>
+              <th>노출 시간</th>
+              <th>공백 시간</th>
+              <th>게임 간격</th>
               <th>실험 시각</th>
             </tr>
           </thead>

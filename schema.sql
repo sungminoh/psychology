@@ -7,5 +7,8 @@ CREATE TABLE app1(
     is_changed      TINYINT(1) NOT NULL,
     user_input      TINYINT(1) NOT NULL,
     correct         TINYINT(1) NOT NULL,
+    expose          INTEGER NOT NULL,
+    blink           INTEGER NOT NULL,
+    inter           INTEGER NOT NULL,
     ts              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
