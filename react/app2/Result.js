@@ -12,6 +12,7 @@ var TableRow = React.createClass({
         <td>{this.props.flip}</td>
         <td>{this.props.userAnswer}</td>
         <td>{this.props.correct}</td>
+        <td>{this.props.delay}</td>
       </tr>
     );
   }
@@ -33,6 +34,19 @@ function calStat(arr){
   };
 }
 
+function average(arr){
+  var sum = 0;
+  for(var i=0; i<arr.length; i++){
+    var parsed = parseFloat(arr[i]);
+    if(isNaN(parsed)){
+      sum += arr[i].toString() == 'true' ? 1 : 0;
+    }else if (typeof(parsed) == 'number'){
+      sum += parseFloat(parsed);
+    }
+  }
+  return sum/arr.length;
+}
+
 var Result = React.createClass({
   getInitialState(){
     return{
@@ -43,6 +57,7 @@ var Result = React.createClass({
   propTypes: {
     gameBoxSeq: React.PropTypes.array,
     userAnswers: React.PropTypes.array,
+    delays: React.PropTypes.array,
     reset: React.PropTypes.func
   },
   componentWillMount(){
@@ -67,6 +82,7 @@ var Result = React.createClass({
     var numberOfUserAnswerFlip = this.props.userAnswers.reduce((a, b) => a + b, 0);
     var corrects = this.corrects.reduce((a, b) => a + b, 0);
     var avgOfCorrects = corrects / this.corrects.length;
+    var avgOfDelays = average(this.props.delays);
 
     return (
       <TableRow
@@ -81,6 +97,7 @@ var Result = React.createClass({
         flip={numberOfFlip + ' / ' + (numberOfGames-numberOfFlip)}
         userAnswer={numberOfUserAnswerFlip + ' / ' + (numberOfGames-numberOfUserAnswerFlip)}
         correct={avgOfCorrects.toFixed(2)}
+        delay={avgOfDelays.toFixed(2)}
       />
     )
   },
@@ -97,6 +114,7 @@ var Result = React.createClass({
           flip={this.props.gameSeq[i][0]}
           userAnswer={this.props.userAnswers[i]}
           correct={this.corrects[i] ? 'O' : 'X'}
+          delay={this.props.delays[i]}
         />
       )
     }
@@ -120,6 +138,7 @@ var Result = React.createClass({
                 <th>반전</th>
                 <th>입력</th>
                 <th>정오</th>
+                <th>응답 시간</th>
               </tr>
             </thead>
             <tbody>

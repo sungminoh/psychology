@@ -15,6 +15,7 @@ var TableRow = React.createClass({
         <td>{this.props.flip}</td>
         <td>{this.props.userAnswer}</td>
         <td>{this.props.correct}</td>
+        <td>{this.props.delay}</td>
         <td>{dateText}</td>
       </tr>
     )
@@ -35,7 +36,8 @@ function  getList(data){
         flip={row[3]}
         userAnswer={row[4]}
         correct={row[5]}
-        ts={row[6]}
+        delay={row[6]}
+        ts={row[7]}
       />
     )
   }
@@ -96,6 +98,7 @@ var History = React.createClass({
               <th>반전</th>
               <th>입력</th>
               <th>정답</th>
+              <th>응답 시간</th>
               <th>실험 시각</th>
             </tr>
           </thead>

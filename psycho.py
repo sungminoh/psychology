@@ -125,24 +125,27 @@ def app2Result():
         request_data = parseJson(request.data)
         game_seq = request_data['gameSeq']
         user_answers = request_data['userAnswers']
+        delays = request_data['delays']
         test_id = get_test_id('app2')
         data = [(test_id,
                  'ㅋ' if game_seq[i][1] == 'char' else '5',
                  game_seq[i][2], game_seq[i][0],
                  user_answers[i],
-                 1 if user_answers[i] == game_seq[i][0] else 0)
+                 1 if user_answers[i] == game_seq[i][0] else 0,
+                 delays[i]
+                 )
                 for i in range(len(game_seq))]
         query = ('INSERT INTO app2 '
                  '(test_id, letter, rotation, flip, '
-                 'user_input, correct) '
-                 'VALUES (%s, %s, %s, %s, %s, %s) ')
+                 'user_input, correct, delay) '
+                 'VALUES (%s, %s, %s, %s, %s, %s, %s) ')
         g.db.cursor().executemany(query, data)
         g.db.commit()
         return jsonify(result='success')
     elif request.method == 'GET':
         query = ('SELECT '
                  'test_id, letter, rotation, flip, '
-                 'user_input, correct, ts '
+                 'user_input, correct, delay, ts '
                  'FROM app2 ')
         data = fetch_data(query)
         return jsonify(result=data)
@@ -159,10 +162,10 @@ def app2Download():
         current_time_string = time.strftime('%Y-%m-%d %H:%M:%S')
         filename = ('app2(%s)' % current_time_string) + '.csv'
         header = ['test_id', 'letter', 'rotation', 'flip',
-                  'user_input', 'correct', 'timestamp']
+                  'user_input', 'correct', 'delay', 'timestamp']
         query = ('SELECT '
                  'test_id, letter, rotation, flip, '
-                 'user_input, correct, ts '
+                 'user_input, correct, delay, ts '
                  'FROM app2 ')
         data = fetch_data(query)
         csvData = [','.join(header)]

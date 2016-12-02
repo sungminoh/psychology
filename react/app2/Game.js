@@ -36,6 +36,7 @@ var Game = React.createClass({
   practiceSeq: null,
   gameSeq: null,
   userAnswers: null,
+  delays: null,
   componentWillMount(){
     this.targetAppearedTime = 0,
     this.practiceIdx = 0;
@@ -43,6 +44,7 @@ var Game = React.createClass({
     this.practiceSeq = [];
     this.gameSeq = [];
     this.userAnswers = [];
+    this.delays= [];
   },
   resetComponent(){
     this.setState(this.getInitialState());
@@ -79,6 +81,7 @@ var Game = React.createClass({
       <Result
         gameSeq={this.gameSeq}
         userAnswers={this.userAnswers}
+        delays={this.delays}
         reset={this.resetComponent}
       />
     );
@@ -178,6 +181,7 @@ var Game = React.createClass({
       }
     }else{
       this.userAnswers.push(reaction);
+      this.delays.push(delay);
       this.gameIdx += 1;
     }
     this.setState({

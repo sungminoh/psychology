@@ -22,5 +22,6 @@ CREATE TABLE app2(
     flip            TINYINT(1) NOT NULL,
     user_input      TINYINT(1) NOT NULL,
     correct         TINYINT(1) NOT NULL,
+    delay           INTEGER NOT NULL,
     ts              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
