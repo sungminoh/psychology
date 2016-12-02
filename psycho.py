@@ -7,7 +7,7 @@ from pdb import set_trace as bp
 import time
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static', static_folder='static')
 
 
 @app.before_request
@@ -123,30 +123,26 @@ def app1Download():
 def app2Result():
     if request.method == 'POST':
         request_data = parseJson(request.data)
-        phone_numbers = request_data['phoneNumbers']
-        delays = request_data['delays']
-        touch_durations = request_data['touchDurations']
-        touch_sizes = request_data['touchSizes']
-        accuracies = request_data['accuracies']
-        button_widths = request_data['buttonWidths']
-        button_heights = request_data['buttonHeights']
+        game_seq = request_data['gameSeq']
+        user_answers = request_data['userAnswers']
         test_id = get_test_id('app2')
-        data = [(test_id, phone_numbers[i],
-                 touch_sizes[i], touch_durations[i],
-                 accuracies[i], delays[i],
-                 button_widths[i], button_heights[i])
-                for i in range(len(phone_numbers))]
+        data = [(test_id,
+                 'ㅋ' if game_seq[i][1] == 'char' else '5',
+                 game_seq[i][2], game_seq[i][0],
+                 user_answers[i],
+                 1 if user_answers[i] == game_seq[i][0] else 0)
+                for i in range(len(game_seq))]
         query = ('INSERT INTO app2 '
-                 '(test_id, phone_number, touch_s, touch_d, '
-                 'accuracy, delay, button_w, button_h) '
-                 'VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ')
+                 '(test_id, letter, rotation, flip, '
+                 'user_input, correct) '
+                 'VALUES (%s, %s, %s, %s, %s, %s) ')
         g.db.cursor().executemany(query, data)
         g.db.commit()
         return jsonify(result='success')
     elif request.method == 'GET':
         query = ('SELECT '
-                 'test_id, phone_number, touch_s, touch_d, '
-                 'accuracy, delay, button_w, button_h, ts '
+                 'test_id, letter, rotation, flip, '
+                 'user_input, correct, ts '
                  'FROM app2 ')
         data = fetch_data(query)
         return jsonify(result=data)
@@ -162,11 +158,11 @@ def app2Download():
     if request.method == 'GET':
         current_time_string = time.strftime('%Y-%m-%d %H:%M:%S')
         filename = ('app2(%s)' % current_time_string) + '.csv'
-        header = ['test_id', 'phone_number', 'touch_size', 'touch_duration',
-                  'error', 'delay', 'button_width', 'button_height', 'timestamp']
+        header = ['test_id', 'letter', 'rotation', 'flip',
+                  'user_input', 'correct', 'timestamp']
         query = ('SELECT '
-                 'test_id, phone_number, touch_s, touch_d, '
-                 'accuracy, delay, button_w, button_h, ts '
+                 'test_id, letter, rotation, flip, '
+                 'user_input, correct, ts '
                  'FROM app2 ')
         data = fetch_data(query)
         csvData = [','.join(header)]

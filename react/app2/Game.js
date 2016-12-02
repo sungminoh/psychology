@@ -6,7 +6,7 @@ import Result from './Result';
 import ColorGrid from './ColorGrid';
 import ResponseButton from './ResponseButton';
 import distinctColors from 'distinct-colors';
-import { random, makeUrl, toHex, generateSeq, generatePallet, randomColorPos } from '../helpers';
+import { random, makeUrl, generateSeq, generatePossibles } from '../helpers';
 import { Button, Grid, Row, Col } from 'react-bootstrap';
 
 
@@ -16,44 +16,32 @@ var Game = React.createClass({
       game: false,
       countdown: false,
       targetDisplay: false,
-      targetHide: false,
-      targetRedisplay: false,
       practice: true,
       done: false,
       numberOfGames: 0,
       numberOfPractices: 0,
-      boxesOfGame: null,
-      boxesOfPractice: null,
+      rotations: null,
+      characters: null,
       responseHeight: 0,
       gridHeight: 0,
       gridWidth: 0,
       maxSize: 0,
       interval: 1000,
-      blink: 900,
-      expose: 100,
       OX: ''
     };
   },
-  pallet: null,
+  targetAppearedTime: null,
   practiceIdx: null,
   gameIdx: null,
-  practiceBoxSeq: null,
-  gameBoxSeq: null,
-  practiceAnswers: null,
-  gameAnswers: null,
-  currentPallet: null,
-  spareColor: null,
+  practiceSeq: null,
+  gameSeq: null,
   userAnswers: null,
   componentWillMount(){
-    this.pallet = [];
-    this.practiceIdx= 0;
-    this.gameIdx= 0;
-    this.practiceBoxSeq = [];
-    this.gameBoxSeq = [];
-    this.practiceAnswers = [];
-    this.gameAnswers = [];
-    this.currentPallet = [];
-    this.spareColor = null;
+    this.targetAppearedTime = 0,
+    this.practiceIdx = 0;
+    this.gameIdx = 0;
+    this.practiceSeq = [];
+    this.gameSeq = [];
     this.userAnswers = [];
   },
   resetComponent(){
@@ -62,28 +50,23 @@ var Game = React.createClass({
     this.componentDidMount();
   },
   startGame(props){
-    this.pallet = toHex(distinctColors({count:Math.pow(props.length, 2)}));
-    this.gameBoxSeq = generateSeq(props.boxesOfGame, props.numberOfGames);
-    this.practiceBoxSeq = generateSeq(props.boxesOfPractice, props.numberOfPractices);
-    this.gameAnswers= generateSeq([1, 0], props.numberOfGames)
-    this.practiceAnswers = generateSeq([1, 0], props.numberOfPractices)
+    this.gameSeq = generateSeq(generatePossibles([[0,1], props.characters, props.rotations]), props.numberOfGames);
+    this.practiceSeq = generateSeq(generatePossibles([[0,1], props.characters, props.rotations]), props.numberOfPractices);
     this.setState({
       game: true,
       practice: props.numberOfPractices == '0' ? false : true,
       countdown: true,
-      length: props.length,
+      //targetDisplay: true, //for test
       numberOfGames: props.numberOfGames,
       numberOfPractices: props.numberOfPractices,
-      boxesOfGame: props.boxesOfGame,
-      boxesOfPractice: props.boxesOfPractice,
+      rotations: props.rotations,
+      characters: props.characters,
       interval: props.interval,
-      blink: props.blink,
-      expose: props.expose
     });
   },
 
   redirectToHistory(e){
-    this.props.router.push({ pathname: makeUrl('/app1/history') });
+    this.props.router.push({ pathname: makeUrl('/app2/history') });
   },
 
   getInputForm(){
@@ -94,70 +77,17 @@ var Game = React.createClass({
   getResult(){
     return (
       <Result
-        gameBoxSeq={this.gameBoxSeq}
-        gameAnswers={this.gameAnswers}
+        gameSeq={this.gameSeq}
         userAnswers={this.userAnswers}
         reset={this.resetComponent}
-        expose={this.state.expose}
-        blink={this.state.blink}
-        interval={this.state.interval}
       />
     );
   },
 
   getCountdownTimer(s){
-    if (this.state.countdown){
-      return (
-        <CountdownTimer
-          sec={s}
-          onExpired={x => {this.setState({ countdown: false, targetDisplay: true});}}
-        />
-      );
-    }else{
-      return null;
-    }
+    return ( <CountdownTimer sec={s} onExpired={x => {this.setState({ countdown: false, targetDisplay: true});}} />);
   },
 
-  getColorGrid(pallet){
-    if(this.state.targetDisplay){
-      return (
-        <ColorGrid
-          pallet={pallet}
-          specs={{height: this.state.gridHeight, width: this.state.gridWidth}}
-          onExpired={
-            x => {
-              this.setState({
-                targetDisplay: false,
-                targetHide: true,
-                targetRedisplay: false
-              })
-            }
-          }
-          afterMilliseconds={this.state.expose}
-          />
-      );
-    }else if(this.state.targetHide){
-      setTimeout(x => {
-        this.setState({
-          targetDisplay: false,
-          targetHide: false,
-          targetRedisplay: true
-        })
-      }, this.state.blink);
-    }else if(this.state.targetRedisplay){
-      if(this.state.practice){
-        if(this.practiceAnswers[this.practiceIdx] == 1) {
-          this.currentPallet[randomColorPos(this.currentPallet)] = this.spareColor;
-        }
-        return ( <ColorGrid pallet={this.currentPallet} specs={{height: this.state.gridHeight, width: this.state.gridWidth}} />);
-      }else{
-        if(this.gameAnswers[this.gameIdx] == 1) {
-          this.currentPallet[randomColorPos(this.currentPallet)] = this.spareColor;
-        }
-        return ( <ColorGrid pallet={this.currentPallet} specs={{height: this.state.gridHeight, width: this.state.gridWidth}} />);
-      }
-    }
-  },
 
   render(){
     if(!this.state.game){
@@ -171,17 +101,33 @@ var Game = React.createClass({
         var countdownTimer = this.getCountdownTimer(3);
         return ( <div> {countdownTimer} </div> );
       }else{
+        var image = null;
         if(this.state.targetDisplay){
-          var pallet, spare;
+          var path = '../static/app2/';
           if(this.state.practice){
-            [pallet, spare] = generatePallet(this.pallet, this.practiceBoxSeq[this.practiceIdx]);
+            path += this.practiceSeq[this.practiceIdx].join('-') + '.png';
           }else{
-            [pallet, spare] = generatePallet(this.pallet, this.gameBoxSeq[this.gameIdx]);
+            path += this.gameSeq[this.gameIdx].join('-') + '.png';
           }
-          this.currentPallet = pallet;
-          this.spareColor = spare;
+          var size = this.state.maxSize*0.8;
+          var margin = (this.state.gridHeight - size) / 2;
+          image = (
+            <div
+              style={{
+                height: this.state.gridHeight,
+                width: '100%'
+              }}>
+              <img
+                src={path}
+                style={{
+                  width: size,
+                  height: 'auto',
+                  display: 'block', margin: 'auto',
+                  marginTop: margin
+                }}/>
+            </div>
+          )
         }
-        var grid = this.getColorGrid(this.currentPallet);
         var feedback = (
           <span
             style={{
@@ -195,7 +141,7 @@ var Game = React.createClass({
         );
         return(
           <div>
-            {!this.state.targetHide && !this.state.targetRedisplay && !this.state.targetDisplay ? feedback : grid}
+            {!this.state.targetDisplay ? feedback : image}
             <div
               style={{
                 height: this.state.responseHeight,
@@ -204,10 +150,10 @@ var Game = React.createClass({
                 bottom: 0
               }}>
               <ResponseButton
-                text={['변함', '안변함']}
+                text={['반전', '정상']}
                 value={[1, 0]}
                 specs={{height: this.state.responseHeight}}
-                disabled={!this.state.targetRedisplay}
+                disabled={!this.state.targetDisplay}
                 callback={this.checkAnswer}/>
             </div>
           </div>
@@ -216,11 +162,12 @@ var Game = React.createClass({
     }
   },
   checkAnswer(e){
+    var delay = Date.now() - this.targetAppearedTime;
     var reaction = parseInt(e.target.value);
     var OX;
     var stillPractice = this.state.practice;
     if(this.state.practice){
-      if(this.practiceAnswers[this.practiceIdx] == reaction){
+      if(this.practiceSeq[this.practiceIdx][0] == reaction){
         OX = '정답';
       }else{
         OX = '오답';
@@ -235,8 +182,6 @@ var Game = React.createClass({
     }
     this.setState({
       targetDisplay: false,
-      targetHide: false,
-      targetRedisplay: false,
       OX: OX,
       practice: stillPractice
     })
@@ -248,8 +193,6 @@ var Game = React.createClass({
     }else{
       this.setState({
         targetDisplay: true,
-        targetHide: false,
-        targetRedisplay: false,
         OX: ''
       })
     }
@@ -258,8 +201,6 @@ var Game = React.createClass({
     this.setState({
       game: false,
       targetDisplay: false,
-      targetHide: false,
-      targetRedisplay: false,
       done: true
     });
   },
@@ -274,13 +215,12 @@ var Game = React.createClass({
       gridWidth: windowWidth,
       maxSize: Math.min(gridHeight, windowWidth)
     })
+  },
+  componentDidUpdate(prevProps, prevState){
+    if(!prevState.targetDisplay && this.state.targetDisplay){
+      this.targetAppearedTime = Date.now();
+    }
   }
-
-
-
-
-
-
 });
 
 module.exports = Game;

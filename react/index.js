@@ -4,9 +4,10 @@ import fetch from 'whatwg-fetch';
 import { Button } from 'react-bootstrap';
 import { Router, Route, browserHistory, IndexRoute, Link } from 'react-router';
 import App1 from './app1/App1';
+import App2 from './app2/App2';
 import { makeUrl } from './helpers';
 import { base } from './config';
-import Game from './app1/Game';
+import Game from './app2/Game';
 
 
 function Index(props){
@@ -60,7 +61,7 @@ const routes = {
   //component:Game,
   indexRoute: {component: Selector},
   childRoutes:[
-    App1
+    App1, App2
   ]
 }
 
