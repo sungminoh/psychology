@@ -6,7 +6,7 @@ import Result from './Result';
 import ColorGrid from './ColorGrid';
 import ResponseButton from './ResponseButton';
 import distinctColors from 'distinct-colors';
-import { random, makeUrl, toHex, generateSeq, generatePallet, randomColorPos } from '../helpers';
+import { random, makeUrl, toHex, genSeq, genPallet, randomColorPos } from '../helpers';
 import { Button, Grid, Row, Col } from 'react-bootstrap';
 
 
@@ -63,10 +63,10 @@ var Game = React.createClass({
   },
   startGame(props){
     this.pallet = toHex(distinctColors({count:Math.pow(props.length, 2)}));
-    this.gameBoxSeq = generateSeq(props.boxesOfGame, props.numberOfGames);
-    this.practiceBoxSeq = generateSeq(props.boxesOfPractice, props.numberOfPractices);
-    this.gameAnswers= generateSeq([1, 0], props.numberOfGames)
-    this.practiceAnswers = generateSeq([1, 0], props.numberOfPractices)
+    this.gameBoxSeq = genSeq(props.boxesOfGame, props.numberOfGames);
+    this.practiceBoxSeq = genSeq(props.boxesOfPractice, props.numberOfPractices);
+    this.gameAnswers= genSeq([1, 0], props.numberOfGames)
+    this.practiceAnswers = genSeq([1, 0], props.numberOfPractices)
     this.setState({
       game: true,
       practice: props.numberOfPractices == '0' ? false : true,
@@ -174,9 +174,9 @@ var Game = React.createClass({
         if(this.state.targetDisplay){
           var pallet, spare;
           if(this.state.practice){
-            [pallet, spare] = generatePallet(this.pallet, this.practiceBoxSeq[this.practiceIdx]);
+            [pallet, spare] = genPallet(this.pallet, this.practiceBoxSeq[this.practiceIdx]);
           }else{
-            [pallet, spare] = generatePallet(this.pallet, this.gameBoxSeq[this.gameIdx]);
+            [pallet, spare] = genPallet(this.pallet, this.gameBoxSeq[this.gameIdx]);
           }
           this.currentPallet = pallet;
           this.spareColor = spare;

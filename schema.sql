@@ -1,5 +1,7 @@
 DROP TABLE IF EXISTS app1;
 DROP TABLE IF EXISTS app2;
+DROP TABLE IF EXISTS app3;
+
 
 CREATE TABLE app1(
     id              INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -20,6 +22,19 @@ CREATE TABLE app2(
     letter          CHARACTER(1) NOT NULL,
     rotation        INTEGER NOT NULL,
     flip            TINYINT(1) NOT NULL,
+    user_input      TINYINT(1) NOT NULL,
+    correct         TINYINT(1) NOT NULL,
+    delay           INTEGER NOT NULL,
+    ts              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE app3(
+    id              INTEGER PRIMARY KEY AUTO_INCREMENT,
+    test_id         INTEGER NOT NULL,
+    val             INTEGER NOT NULL,
+    quant           INTEGER NOT NULL,
+    game_type       CHARACTER(1) NOT NULL,
+    compatibility   VARCHAR(32) NOT NULL,
     user_input      TINYINT(1) NOT NULL,
     correct         TINYINT(1) NOT NULL,
     delay           INTEGER NOT NULL,

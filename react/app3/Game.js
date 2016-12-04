@@ -1,14 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import CountdownTimer from '../CountdownTimer';
-import InputForm from './InputForm'
+import InputForm from './InputForm';
+import NumberGrid from './NumberGrid';
 import Result from './Result';
-import ColorGrid from './ColorGrid';
 import ResponseButton from './ResponseButton';
 import distinctColors from 'distinct-colors';
-import { random, makeUrl, genSeq, genPossibles } from '../helpers';
+import { random, makeUrl, genMaintains, genSwitchSeq, genNumbers } from '../helpers';
 import { Button, Grid, Row, Col } from 'react-bootstrap';
 
+var possibles = [1,2,3,4,6,7,8,9];
 
 var Game = React.createClass({
   getInitialState() {
@@ -18,32 +19,37 @@ var Game = React.createClass({
       targetDisplay: false,
       practice: true,
       done: false,
+      currentGameType: null,
       numberOfGames: 0,
       numberOfPractices: 0,
-      rotations: null,
-      characters: null,
       responseHeight: 0,
       gridHeight: 0,
       gridWidth: 0,
       maxSize: 0,
-      interval: 1000,
-      OX: ''
+      OX: '',
+      interval: 0
     };
   },
   targetAppearedTime: null,
   practiceIdx: null,
-  gameIdx: null,
+  practiceSwitchSeq: null,
   practiceSeq: null,
+  gameIdx: null,
+  gameSwitchSeq: null,
   gameSeq: null,
   userAnswers: null,
+  gameTypes: null,
   delays: null,
   componentWillMount(){
     this.targetAppearedTime = 0,
     this.practiceIdx = 0;
-    this.gameIdx = 0;
+    this.practiceSwitchSeq = [];
     this.practiceSeq = [];
+    this.gameIdx = 0;
+    this.gameSwitchSeq = [];
     this.gameSeq = [];
     this.userAnswers = [];
+    this.gameTypes = [];
     this.delays= [];
   },
   resetComponent(){
@@ -52,23 +58,24 @@ var Game = React.createClass({
     this.componentDidMount();
   },
   startGame(props){
-    this.gameSeq = genSeq(genPossibles([[0,1], props.characters, props.rotations]), props.numberOfGames);
-    this.practiceSeq = genSeq(genPossibles([[0,1], props.characters, props.rotations]), props.numberOfPractices);
+    this.gameSwitchSeq= genSwitchSeq(genMaintains(props.numberOfGames, props.ratio));
+    this.gameSeq = genNumbers(this.gameSwitchSeq, possibles)
+    this.practiceSwitchSeq = genSwitchSeq(genMaintains(props.numberOfPractices, props.ratio));
+    this.practiceSeq = genNumbers(this.practiceSwitchSeq, possibles)
     this.setState({
       game: true,
       practice: props.numberOfPractices == '0' ? false : true,
-      countdown: true,
-      //targetDisplay: true, //for test
+      //countdown: true,
+      targetDisplay: true, //for test
       numberOfGames: props.numberOfGames,
       numberOfPractices: props.numberOfPractices,
-      rotations: props.rotations,
-      characters: props.characters,
-      interval: props.interval,
+      currentGameType: random(2),
+      interval: props.interval
     });
   },
 
   redirectToHistory(e){
-    this.props.router.push({ pathname: makeUrl('/app2/history') });
+    this.props.router.push({ pathname: makeUrl('/app3/history') });
   },
 
   getInputForm(){
@@ -76,11 +83,17 @@ var Game = React.createClass({
     return ( <InputForm onClick={this.startGame} additionalButtons={historyButton} />);
   },
 
+  getNumberGrid(numbers){
+    return <NumberGrid numbers={numbers} specs={{height: this.state.gridHeight, width: this.state.gridWidth}} />;
+  },
+
   getResult(){
     return (
       <Result
+        gameSwitchSeq={this.gameSwitchSeq}
         gameSeq={this.gameSeq}
         userAnswers={this.userAnswers}
+        gameTypes={this.gameTypes}
         delays={this.delays}
         reset={this.resetComponent}
       />
@@ -104,32 +117,19 @@ var Game = React.createClass({
         var countdownTimer = this.getCountdownTimer(3);
         return ( <div> {countdownTimer} </div> );
       }else{
-        var image = null;
+        var text = [];
+        var numberGrid = null;
         if(this.state.targetDisplay){
-          var path = '../static/app2/';
-          if(this.state.practice){
-            path += this.practiceSeq[this.practiceIdx].join('-') + '.png';
-          }else{
-            path += this.gameSeq[this.gameIdx].join('-') + '.png';
+          if(this.state.currentGameType == 0){
+            text = ['적다', '많다'];
+          } else{
+            text = ['작다', '크다'];
           }
-          var size = this.state.maxSize*0.8;
-          var margin = (this.state.gridHeight - size) / 2;
-          image = (
-            <div
-              style={{
-                height: this.state.gridHeight,
-                width: '100%'
-              }}>
-              <img
-                src={path}
-                style={{
-                  width: size,
-                  height: 'auto',
-                  display: 'block', margin: 'auto',
-                  marginTop: margin
-                }}/>
-            </div>
-          )
+          if(this.state.practice){
+            numberGrid = this.getNumberGrid(this.practiceSeq[this.practiceIdx]);
+          }else{
+            numberGrid = this.getNumberGrid(this.gameSeq[this.gameIdx]);
+          }
         }
         var feedback = (
           <span
@@ -144,7 +144,7 @@ var Game = React.createClass({
         );
         return(
           <div>
-            {!this.state.targetDisplay ? feedback : image}
+            {!this.state.targetDisplay ? feedback : numberGrid}
             <div
               style={{
                 height: this.state.responseHeight,
@@ -153,8 +153,8 @@ var Game = React.createClass({
                 bottom: 0
               }}>
               <ResponseButton
-                text={['반전', '정상']}
-                value={[1, 0]}
+                text={text}
+                value={[0, 1]}
                 specs={{height: this.state.responseHeight}}
                 disabled={!this.state.targetDisplay}
                 callback={this.checkAnswer}/>
@@ -168,9 +168,10 @@ var Game = React.createClass({
     var delay = Date.now() - this.targetAppearedTime;
     var reaction = parseInt(e.target.value);
     var OX;
+    var nextGameType = this.state.currentGameType;
     var stillPractice = this.state.practice;
     if(this.state.practice){
-      if(this.practiceSeq[this.practiceIdx][0] == reaction){
+      if((this.practiceSeq[this.practiceIdx][this.state.currentGameType] > 5) == reaction){
         OX = '정답';
       }else{
         OX = '오답';
@@ -179,15 +180,27 @@ var Game = React.createClass({
       if(this.practiceIdx == this.state.numberOfPractices){
         stillPractice = false
       }
+      if(stillPractice){
+        if(this.practiceSwitchSeq[this.practiceIdx] > 0){
+          nextGameType = (nextGameType+1)%2;
+        }
+      }else{
+          nextGameType = random(2);
+      }
     }else{
       this.userAnswers.push(reaction);
+      this.gameTypes.push(this.state.currentGameType);
       this.delays.push(delay);
       this.gameIdx += 1;
+      if(this.gameSwitchSeq[this.gameIdx] > 0){
+        nextGameType = (nextGameType+1)%2;
+      }
     }
     this.setState({
       targetDisplay: false,
       OX: OX,
-      practice: stillPractice
+      practice: stillPractice,
+      currentGameType: nextGameType
     })
     setTimeout(this.nextGame, this.state.interval);
   },

@@ -27,6 +27,9 @@ def teardown_request(exception):
 @app.route('/app2')
 @app.route('/app2/game')
 @app.route('/app2/history')
+@app.route('/app3')
+@app.route('/app3/game')
+@app.route('/app3/history')
 def index():
     return render_template('index.html')
 
@@ -167,6 +170,71 @@ def app2Download():
                  'test_id, letter, rotation, flip, '
                  'user_input, correct, delay, ts '
                  'FROM app2 ')
+        data = fetch_data(query)
+        csvData = [','.join(header)]
+        csvData.extend([','.join(str(x) for x in entity) for entity in data])
+        csvText = '\n'.join(csvData)
+        return Response(csvText,
+                        mimetype='text/csv',
+                        headers={
+                            'Content-disposition':
+                            'attachment; filename=%s' % filename
+                        })
+
+
+@app.route('/app3/result', methods=['POST', 'GET', 'DELETE'])
+def app3Result():
+    if request.method == 'POST':
+        request_data = parseJson(request.data)
+        switch_seq = request_data['gameSwitchSeq']
+        seq = request_data['gameSeq']
+        types = request_data['gameTypes']
+        answers = request_data['userAnswers']
+        corrects = request_data['corrects']
+        delays = request_data['delays']
+        test_id = get_test_id('app3')
+        data = [(test_id,
+                 seq[i][1], seq[i][0],
+                 '양' if types[i] == 0 else '수',
+                 'maintain' if switch_seq[i] == 0 else
+                 'compatible' if switch_seq[i] == 1 else 'incompitible',
+                 answers[i], corrects[i],
+                 delays[i]
+                 )
+                for i in range(len(seq))]
+        print data
+        query = ('INSERT INTO app3 '
+                 '(test_id, val, quant, game_type, '
+                 'compatibility, user_input, correct, delay) '
+                 'VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ')
+        g.db.cursor().executemany(query, data)
+        g.db.commit()
+        return jsonify(result='success')
+    elif request.method == 'GET':
+        query = ('SELECT '
+                 'test_id, val, quant, game_type, '
+                 'compatibility, user_input, correct, delay, ts '
+                 'FROM app3 ')
+        data = fetch_data(query)
+        return jsonify(result=data)
+    elif request.method == 'DELETE':
+        query = ('DELETE FROM app3')
+        g.db.cursor().execute(query)
+        g.db.commit()
+        return jsonify(result='success')
+
+
+@app.route('/app3/download', methods=['GET'])
+def app3Download():
+    if request.method == 'GET':
+        current_time_string = time.strftime('%Y-%m-%d %H:%M:%S')
+        filename = ('app3(%s)' % current_time_string) + '.csv'
+        header = ['test_id', 'value', 'quantity', 'game_type', 'compatibility',
+                  'user_input', 'correct', 'delay', 'timestamp']
+        query = ('SELECT '
+                 'test_id, val, quant, game_type, '
+                 'compatibility, user_input, correct, delay, ts '
+                 'FROM app3 ')
         data = fetch_data(query)
         csvData = [','.join(header)]
         csvData.extend([','.join(str(x) for x in entity) for entity in data])
