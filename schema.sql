@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS app1;
 DROP TABLE IF EXISTS app2;
 DROP TABLE IF EXISTS app3;
+DROP TABLE IF EXISTS app4;
 
 
 CREATE TABLE app1(
@@ -39,4 +40,18 @@ CREATE TABLE app3(
     correct         TINYINT(1) NOT NULL,
     delay           INTEGER NOT NULL,
     ts              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
+);
+
+CREATE TABLE app4(
+    id              INTEGER PRIMARY KEY AUTO_INCREMENT,
+    test_id         INTEGER NOT NULL,
+    location        VARCHAR(8) NOT NULL,
+    stop            INTEGER NOT NULL,
+    user_input      VARCHAR(8) NOT NULL,
+    correct         VARCHAR(8) NOT NULL,
+    fixation        INTEGER NOT NULL,
+    blink           INTEGER NOT NULL,
+    wait            INTEGER NOT NULL,
+    ts              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+

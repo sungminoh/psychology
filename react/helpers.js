@@ -11,6 +11,19 @@ function random (min, max) {
 	return Math.floor(r * (max - min) + min);
 };
 
+function counter(arr){
+  var cnt = {};
+  for(var i=0; i<arr.length; i++){
+    if (arr[i] in cnt){
+      cnt[arr[i]] += 1;
+    }else{
+      cnt[arr[i]] = 1;
+    }
+  }
+  return cnt;
+};
+
+
 function clone(obj) {
 	var newObj = {};
 	for (var prop in obj) {
@@ -173,9 +186,16 @@ function genNumbers(switchSeq, possibles){
   return arr;
 }
 
+function genStopSeq(n, ratio, delay){
+  var numberOfStops = Math.floor(n * ratio / 100);
+  var stopSeq = genSeq([delay-40, delay, delay+40], numberOfStops)
+  var arr = arrRepeat(0, n-numberOfStops);
+  return d3.shuffle(arr.concat(stopSeq));
+}
 
 module.exports = {
 	random: random,
+  counter: counter,
 	clone: clone,
   arrRepeat: arrRepeat,
   genSeq: genSeq,
@@ -186,8 +206,10 @@ module.exports = {
   randomColorPos: randomColorPos,
   // for app2
   genPossibles: genPossibles,
-  // fo app3
+  // for app3
   genMaintains: genMaintains,
   genSwitchSeq: genSwitchSeq,
-  genNumbers: genNumbers
+  genNumbers: genNumbers,
+  // for app4
+  genStopSeq: genStopSeq
 };

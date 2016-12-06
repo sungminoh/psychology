@@ -30,6 +30,8 @@ def teardown_request(exception):
 @app.route('/app3')
 @app.route('/app3/game')
 @app.route('/app3/history')
+@app.route('/app4/game')
+@app.route('/app4/history')
 def index():
     return render_template('index.html')
 
@@ -235,6 +237,68 @@ def app3Download():
                  'test_id, val, quant, game_type, '
                  'compatibility, user_input, correct, delay, ts '
                  'FROM app3 ')
+        data = fetch_data(query)
+        csvData = [','.join(header)]
+        csvData.extend([','.join(str(x) for x in entity) for entity in data])
+        csvText = '\n'.join(csvData)
+        return Response(csvText,
+                        mimetype='text/csv',
+                        headers={
+                            'Content-disposition':
+                            'attachment; filename=%s' % filename
+                        })
+
+
+@app.route('/app4/result', methods=['POST', 'GET', 'DELETE'])
+def app4Result():
+    if request.method == 'POST':
+        request_data = parseJson(request.data)
+        seq = request_data['seq']
+        stop_seq = request_data['stopSeq']
+        user_answers = request_data['userAnswers']
+        corrects = request_data['corrects']
+        fixation = request_data['fixation']
+        blink = request_data['blink']
+        wait = request_data['wait']
+        test_id = get_test_id('app4')
+        data = [(test_id,
+                 seq[i], stop_seq[i], user_answers[i], corrects[i],
+                 fixation, blink, wait)
+                for i in range(len(seq))]
+        query = ('INSERT INTO app4 '
+                 '(test_id, location, stop, user_input, correct, '
+                 'fixation, blink, wait) '
+                 'VALUES (%s, %s, %s, %s, %s, %s, %s, %s)')
+        g.db.cursor().executemany(query, data)
+        g.db.commit()
+        return jsonify(result='success')
+    elif request.method == 'GET':
+        query = ('SELECT '
+                 'test_id, location, stop, user_input, correct, '
+                 'fixation, blink, wait, ts '
+                 'FROM app4 ')
+        data = fetch_data(query)
+        return jsonify(result=data)
+    elif request.method == 'DELETE':
+        query = ('DELETE FROM app4')
+        g.db.cursor().execute(query)
+        g.db.commit()
+        return jsonify(result='success')
+
+
+@app.route('/app4/download', methods=['GET'])
+def app4Download():
+    if request.method == 'GET':
+        current_time_string = time.strftime('%Y-%m-%d %H:%M:%S')
+        filename = ('app4(%s)' % current_time_string) + '.csv'
+
+        header = ['test_id',
+                  'location', 'stop_signal', 'user_input', 'is_correct',
+                  'fixation', 'blink', 'wait', 'timestamp']
+        query = ('SELECT '
+                 'test_id, location, stop, user_input, correct, '
+                 'fixation, blink, wait, ts '
+                 'FROM app4 ')
         data = fetch_data(query)
         csvData = [','.join(header)]
         csvData.extend([','.join(str(x) for x in entity) for entity in data])

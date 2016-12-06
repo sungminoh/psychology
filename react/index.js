@@ -6,9 +6,9 @@ import { Router, Route, browserHistory, IndexRoute, Link } from 'react-router';
 import App1 from './app1/App1';
 import App2 from './app2/App2';
 import App3 from './app3/App3';
+import App4 from './app4/App4';
 import { makeUrl } from './helpers';
 import { base } from './config';
-import Game from './app3/Game';
 
 
 function Index(props){
@@ -59,10 +59,9 @@ var Selector = React.createClass({
 const routes = {
   path: base,
   component:Index,
-  //component:Game,
   indexRoute: {component: Selector},
   childRoutes:[
-    App1, App2, App3
+    App1, App2, App3, App4
   ]
 }
 
