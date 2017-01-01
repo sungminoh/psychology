@@ -66,6 +66,7 @@ def fetch_data(query, params=None):
 def app1Result():
     if request.method == 'POST':
         request_data = parseJson(request.data)
+        test_id = request_data['testId']
         game_box_seq = request_data['gameBoxSeq']
         game_answers = request_data['gameAnswers']
         user_answers = request_data['userAnswers']
@@ -73,7 +74,7 @@ def app1Result():
         expose = request_data['expose']
         blink = request_data['blink']
         interval = request_data['interval']
-        test_id = get_test_id('app1')
+        # test_id = get_test_id('app1')
         data = [(test_id,
                  game_box_seq[i], game_answers[i], user_answers[i], corrects[i],
                  expose, blink, interval)
@@ -128,10 +129,11 @@ def app1Download():
 def app2Result():
     if request.method == 'POST':
         request_data = parseJson(request.data)
+        test_id = request_data['testId']
         game_seq = request_data['gameSeq']
         user_answers = request_data['userAnswers']
         delays = request_data['delays']
-        test_id = get_test_id('app2')
+        # test_id = get_test_id('app2')
         data = [(test_id,
                  'ㅋ' if game_seq[i][1] == 'char' else '5',
                  game_seq[i][2], game_seq[i][0],
@@ -188,13 +190,14 @@ def app2Download():
 def app3Result():
     if request.method == 'POST':
         request_data = parseJson(request.data)
+        test_id = request_data['testId']
         switch_seq = request_data['gameSwitchSeq']
         seq = request_data['gameSeq']
         types = request_data['gameTypes']
         answers = request_data['userAnswers']
         corrects = request_data['corrects']
         delays = request_data['delays']
-        test_id = get_test_id('app3')
+        # test_id = get_test_id('app3')
         data = [(test_id,
                  seq[i][1], seq[i][0],
                  '양' if types[i] == 0 else '수',
@@ -253,28 +256,30 @@ def app3Download():
 def app4Result():
     if request.method == 'POST':
         request_data = parseJson(request.data)
+        test_id = request_data['testId']
         seq = request_data['seq']
         stop_seq = request_data['stopSeq']
         user_answers = request_data['userAnswers']
         corrects = request_data['corrects']
+        delays = request_data['delays']
         fixation = request_data['fixation']
         blink = request_data['blink']
         wait = request_data['wait']
-        test_id = get_test_id('app4')
+        # test_id = get_test_id('app4')
         data = [(test_id,
-                 seq[i], stop_seq[i], user_answers[i], corrects[i],
+                 seq[i], stop_seq[i], user_answers[i], corrects[i], delays[i],
                  fixation, blink, wait)
                 for i in range(len(seq))]
         query = ('INSERT INTO app4 '
-                 '(test_id, location, stop, user_input, correct, '
+                 '(test_id, location, stop, user_input, correct, delay, '
                  'fixation, blink, wait) '
-                 'VALUES (%s, %s, %s, %s, %s, %s, %s, %s)')
+                 'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)')
         g.db.cursor().executemany(query, data)
         g.db.commit()
         return jsonify(result='success')
     elif request.method == 'GET':
         query = ('SELECT '
-                 'test_id, location, stop, user_input, correct, '
+                 'test_id, location, stop, user_input, correct, delay, '
                  'fixation, blink, wait, ts '
                  'FROM app4 ')
         data = fetch_data(query)
@@ -291,12 +296,11 @@ def app4Download():
     if request.method == 'GET':
         current_time_string = time.strftime('%Y-%m-%d %H:%M:%S')
         filename = ('app4(%s)' % current_time_string) + '.csv'
-
         header = ['test_id',
-                  'location', 'stop_signal', 'user_input', 'is_correct',
+                  'location', 'stop_signal', 'user_input', 'is_correct', 'delay',
                   'fixation', 'blink', 'wait', 'timestamp']
         query = ('SELECT '
-                 'test_id, location, stop, user_input, correct, '
+                 'test_id, location, stop, user_input, correct, delay, '
                  'fixation, blink, wait, ts '
                  'FROM app4 ')
         data = fetch_data(query)

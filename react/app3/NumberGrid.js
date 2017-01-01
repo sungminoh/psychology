@@ -1,9 +1,10 @@
 import React from 'react';
 import { Button, Grid, Row, Col } from 'react-bootstrap';
+import { arrRepeat } from '../helpers';
 
 
 var NumberGrid = React.createClass({
-  getRows(numbers, size){
+  _getRows(numbers, size){
     var quantity = numbers[0];
     var value = numbers[1];
     var number = Math.sqrt(9);
@@ -28,25 +29,41 @@ var NumberGrid = React.createClass({
     }
     return rows;
   },
+  getRows(numbers, size){
+    var quantity = numbers[0];
+    var value = numbers[1];
+    var numberString = arrRepeat(value, quantity).join(' ');
+    return (
+      <div
+        style={{
+          fontSize: size/10,
+          textAlign: 'center',
+          marginTop: size/6
+        }}>
+        {numberString}
+      </div>
+    );
+  },
   render(){
     var specs = this.props.specs;
     var size = Math.min(specs.height, specs.width);
     var verticalPadding = (specs.height-size)/2;
     var horizentalPadding = (specs.width-size)/2;
-    return(
-      <Grid
-        style={{
-          minHeight: specs.height,
-          minWidth: specs.width,
-          paddingTop: verticalPadding,
-          paddingBottom: verticalPadding,
-          paddingLeft: horizentalPadding,
-          paddingRight: horizentalPadding,
-        }}
-      >
-        {this.getRows(this.props.numbers, size)}
-      </Grid>
-    );
+    return this.getRows(this.props.numbers, size);
+    //return(
+      //<Grid
+        //style={{
+          //minHeight: specs.height,
+          //minWidth: specs.width,
+          //paddingTop: verticalPadding,
+          //paddingBottom: verticalPadding,
+          //paddingLeft: horizentalPadding,
+          //paddingRight: horizentalPadding,
+        //}}
+      //>
+        //{this.getRows(this.props.numbers, size)}
+      //</Grid>
+    //);
   },
 });
 

@@ -9,6 +9,8 @@ var InputForm = React.createClass({
 
   getInitialState() {
     return {
+      id: '',
+      isValidId: false,
       numberOfGames: 120,
       isValidNumberOfGames: true,
       numberOfPractices: 12,
@@ -25,6 +27,14 @@ var InputForm = React.createClass({
       return 'success';
     }else{
       return 'error';
+    }
+  },
+
+  changeId(e){
+    if(e.target.value.length != 0){
+      this.setState({isValidId: true, id: e.target.value });
+    }else{
+      this.setState({isValidId: false, id: e.target.value });
     }
   },
 
@@ -62,6 +72,17 @@ var InputForm = React.createClass({
   render() {
     return (
       <Form style={{margin: 10}}>
+        <FormGroup validationState={this.getValidationState('isValidId')} >
+          <ControlLabel>실험 아이디:</ControlLabel>
+          {' '}
+          <FormControl
+            type='text'
+            placeholder={'아이디를 입력하세요.'}
+            onChange={this.changeId}
+          />
+          <FormControl.Feedback/>
+        </FormGroup>
+        {' '}
         <FormGroup validationState={this.getValidationState('isValidNumberOfGames')} >
           <ControlLabel>게임 횟수:</ControlLabel>
           {' '}
@@ -100,6 +121,7 @@ var InputForm = React.createClass({
           onClick={this.startGame}
           disabled={
             !this.state.isValidNumberOfGames
+              || !this.state.isValidId
               || !this.state.isValidNumberOfPractices
               || !this.state.isValidRatio
           }

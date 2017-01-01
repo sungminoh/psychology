@@ -76,13 +76,34 @@ function randomColorPos(pallet){
   return colorIndices[Math.floor(Math.random() * colorIndices.length)];
 }
 
+function pickRandom(set){
+  var count = 0;
+  var picked;
+  for(var e of set){
+    if(Math.random() < 1/++count) picked = e;
+  }
+  return picked;
+}
+
 function genPallet(pallet, n){
+  var size = Math.sqrt(pallet.length);
   var ret = arrRepeat('#ffffff', pallet.length);
   var colors = d3.shuffle(pallet).slice(0, n+1);
-  for(var i=0; i<Math.min(n, pallet.length); i++){
-    ret[i] = colors[i];
+  var set = new Set();
+  for(var i=0; i<pallet.length; i++) set.add(i);
+  for(var i=0; i<n && set.size!=0; i++){
+    var p = pickRandom(set);
+    ret[p] = colors.pop();
+    if(p%size != 0) set.delete(p-1);
+    if(p%size != n-1) set.delete(p+1);
+    if(parseInt(p/n) != 0) set.delete(p-n);
+    if(parseInt(p/n) != n-1) set.delete(p+n);
+    if(p%size != 0 && parseInt(p/n) != 0) set.delete(p-n-1);
+    if(p%size != n-1 && parseInt(p/n) != 0) set.delete(p-n+1);
+    if(p%size != 0 && parseInt(p/n) != n-1) set.delete(p+n-1);
+    if(p%size != n-1 && parseInt(p/n) != n-1) set.delete(p+n+1);
   }
-  return [d3.shuffle(ret), colors[n]];
+  return [ret, colors.pop()];
 }
 
 function expandPossibles(possibles, options){

@@ -25,6 +25,7 @@ var Game = React.createClass({
       beforeNext: false,
       practice: true,
       done: false,
+      id: '',
       numberOfGames: 0,
       numberOfPractices: 0,
       fixation: 0,
@@ -38,22 +39,26 @@ var Game = React.createClass({
       OX: ''
     };
   },
+  targetAppearedTime: null,
   practiceIdx: null,
   gameIdx: null,
   practiceSeq: null,
   practiceStopSeq: null,
   gameSeq: null,
   gameStopSeq: null,
+  delays: null,
   userAnswers: null,
   corrects: null,
   timeoutList: null,
   componentWillMount(){
+    this.targetAppearedTime = 0;
     this.practiceIdx= 0;
     this.gameIdx= 0;
     this.practiceSeq = [];
     this.practiceStopSeq = [];
     this.gameSeq = [];
     this.gameStopSeq = [];
+    this.delays = [];
     this.userAnswers = [];
     this.corrects= [];
     this.timeoutList = [];
@@ -77,6 +82,7 @@ var Game = React.createClass({
       stopDisplay: false,
       beforeNext: false,
       done: false,
+      id: props.id,
       practice: props.numberOfPractices == '0' ? false : true,
       numberOfGames: props.numberOfGames,
       numberOfPractices: props.numberOfPractices,
@@ -89,6 +95,9 @@ var Game = React.createClass({
   redirectToHistory(e){
     this.props.router.push({ pathname: makeUrl('/app4/history') });
   },
+  redirectToHome(){
+    this.props.router.push({ pathname: makeUrl('/') });
+  },
 
   getInputForm(){
     var historyButton = ( <Button onClick={this.redirectToHistory} > 기록 보기 </Button>);
@@ -98,11 +107,14 @@ var Game = React.createClass({
   getResult(){
     return (
       <Result
+        testId={this.state.id}
         seq={this.gameSeq}
         stopSeq={this.gameStopSeq}
+        delays={this.delays}
         userAnswers={this.userAnswers}
         corrects={this.corrects}
         reset={this.resetComponent}
+        home={this.redirectToHome}
         fixation={this.state.fixation}
         blink={this.state.blink}
         wait={this.state.wait}
@@ -166,7 +178,23 @@ var Game = React.createClass({
     );
   },
   getButton(){
-    if(this.state.beforeNext){
+    if(this.state.practiceDone){
+      return (
+        <div
+          style={{
+            height: this.state.responseHeight,
+              width: '100%',
+              position: 'absolute',
+              bottom: 0
+          }}>
+          <Button
+            style={{width:'100%', height:'100%', fontSize: this.state.responseHeight/2, color: 'red'}}
+            onClick={this.nextGame} >
+            게임 시작
+          </Button>
+        </div>
+      );
+    }else if(this.state.beforeNext){
       return (
         <div
           style={{
@@ -237,7 +265,6 @@ var Game = React.createClass({
         } else if(!this.state.fixationHide){
           main = this.getFeedback();
         }
-        //var stop = this.getStop();
         var button = this.getButton();
         return(
           <div>
@@ -266,15 +293,18 @@ var Game = React.createClass({
       seq = this.gameSeq;
       idx = this.gameIdx;
     }
+    var delay = Date.now() - this.targetAppearedTime;
     var OX;
     if(this.state.stopDisplay){
       if(reaction == 'none'){
+        delay = '';
         OX = '정답';
       }else{
         OX = '오답';
       }
     }else{
       if(reaction == 'none'){
+        delay = '';
         OX = '미응답';
       }else if(seq[idx] == reaction){
         OX = '정답';
@@ -282,13 +312,16 @@ var Game = React.createClass({
         OX = '오답';
       }
     }
-    var stillPractice = this.state.practice;
+    //var stillPractice = this.state.practice;
+    var practiceDone = false;
     if(this.state.practice){
       this.practiceIdx += 1;
       if(this.practiceIdx == this.state.numberOfPractices){
-        stillPractice = false
+        //stillPractice = false
+        practiceDone = true;
       }
     }else{
+      this.delays.push(delay);
       this.userAnswers.push(reaction);
       this.corrects.push(OX);
       OX = '';
@@ -300,21 +333,35 @@ var Game = React.createClass({
       targetRedisplay: false,
       beforeNext: true,
       OX: OX,
-      practice: stillPractice
+      practiceDone: practiceDone
+      //practice: stillPractice
     })
   },
   nextGame(){
     if(this.gameIdx == this.state.numberOfGames){
       this.endGame();
     }else{
-      this.setState({
-        fixationDisplay: true,
-        fixationHide: false,
-        targetDisplay: false,
-        stopDisplay: false,
-        beforeNext: false,
-        OX: ''
-      })
+      if(this.state.practiceDone){
+        this.setState({
+          fixationDisplay: true,
+          fixationHide: false,
+          targetDisplay: false,
+          stopDisplay: false,
+          beforeNext: false,
+          practice: false,
+          practiceDone: false,
+          OX: ''
+        });
+      }else{
+        this.setState({
+          fixationDisplay: true,
+          fixationHide: false,
+          targetDisplay: false,
+          stopDisplay: false,
+          beforeNext: false,
+          OX: ''
+        });
+      }
     }
   },
   endGame(){
@@ -328,18 +375,35 @@ var Game = React.createClass({
       done: true
     });
   },
-  componentDidMount(){
+  componentDidUpdate(prevProps, prevState){
+    if(!prevState.targetDisplay && this.state.targetDisplay){
+      this.targetAppearedTime = Date.now();
+    }
     var windowHeight = window.innerHeight;
     var windowWidth = window.innerWidth;
     var responseHeight = Math.max(windowHeight*0.2, 50);
-    var gridHeight = windowHeight - responseHeight;
-    this.setState({
-      responseHeight: responseHeight,
-      gridHeight: gridHeight,
-      gridWidth: windowWidth,
-      maxSize: Math.min(gridHeight, windowWidth)
-    })
-  }
+    if(this.state.responseHeight != responseHeight){
+      var gridHeight = windowHeight - responseHeight;
+      this.setState({
+        responseHeight: responseHeight,
+        gridHeight: gridHeight,
+        gridWidth: windowWidth,
+        maxSize: Math.min(gridHeight, windowWidth)
+      });
+    }
+  },
+  //componentDidMount(){
+    //var windowHeight = window.innerHeight;
+    //var windowWidth = window.innerWidth;
+    //var responseHeight = Math.max(windowHeight*0.2, 50);
+    //var gridHeight = windowHeight - responseHeight;
+    //this.setState({
+      //responseHeight: responseHeight,
+      //gridHeight: gridHeight,
+      //gridWidth: windowWidth,
+      //maxSize: Math.min(gridHeight, windowWidth)
+    //})
+  //}
 });
 
 module.exports = Game;

@@ -18,7 +18,9 @@ var Game = React.createClass({
       countdown: false,
       targetDisplay: false,
       practice: true,
+      practiceDone: false,
       done: false,
+      id: '',
       currentGameType: null,
       numberOfGames: 0,
       numberOfPractices: 0,
@@ -65,8 +67,9 @@ var Game = React.createClass({
     this.setState({
       game: true,
       practice: props.numberOfPractices == '0' ? false : true,
-      //countdown: true,
-      targetDisplay: true, //for test
+      countdown: true,
+      //targetDisplay: true, //for test
+      id: props.id,
       numberOfGames: props.numberOfGames,
       numberOfPractices: props.numberOfPractices,
       currentGameType: random(2),
@@ -76,6 +79,9 @@ var Game = React.createClass({
 
   redirectToHistory(e){
     this.props.router.push({ pathname: makeUrl('/app3/history') });
+  },
+  redirectToHome(){
+    this.props.router.push({ pathname: makeUrl('/') });
   },
 
   getInputForm(){
@@ -90,20 +96,60 @@ var Game = React.createClass({
   getResult(){
     return (
       <Result
+        testId={this.state.id}
         gameSwitchSeq={this.gameSwitchSeq}
         gameSeq={this.gameSeq}
         userAnswers={this.userAnswers}
         gameTypes={this.gameTypes}
         delays={this.delays}
         reset={this.resetComponent}
+        home={this.redirectToHome}
       />
     );
   },
 
   getCountdownTimer(s){
-    return ( <CountdownTimer sec={s} onExpired={x => {this.setState({ countdown: false, targetDisplay: true});}} />);
+    //return ( <CountdownTimer sec={s} onExpired={x => {this.setState({ countdown: false, targetDisplay: true});}} />);
+    return ( <CountdownTimer sec={s} onExpired={x => {this.nextGame();}} />);
   },
 
+  getButton(){
+    if(this.state.practiceDone && !this.state.showGameType){
+      return (
+        <div
+          style={{
+            height: this.state.responseHeight,
+              width: '100%',
+              position: 'absolute',
+              bottom: 0
+          }}>
+          <Button
+            style={{width:'100%', height:'100%', fontSize: this.state.responseHeight/2, color: 'red'}}
+            onClick={this.nextGame} >
+            게임 시작
+          </Button>
+        </div>
+      );
+    }else{
+      var text = this.state.currentGameType == 0 ? ['적다', '많다'] : ['작다', '크다'];
+      return(
+        <div
+          style={{
+            height: this.state.responseHeight,
+              width: '100%',
+              position: 'absolute',
+              bottom: 0
+          }}>
+          <ResponseButton
+            text={text}
+            value={[0, 1]}
+            specs={{height: this.state.responseHeight}}
+            disabled={!this.state.targetDisplay}
+            callback={this.checkAnswer}/>
+        </div>
+      );
+    }
+  },
 
   render(){
     if(!this.state.game){
@@ -120,16 +166,8 @@ var Game = React.createClass({
         var text = [];
         var numberGrid = null;
         if(this.state.targetDisplay){
-          if(this.state.currentGameType == 0){
-            text = ['적다', '많다'];
-          } else{
-            text = ['작다', '크다'];
-          }
-          if(this.state.practice){
-            numberGrid = this.getNumberGrid(this.practiceSeq[this.practiceIdx]);
-          }else{
-            numberGrid = this.getNumberGrid(this.gameSeq[this.gameIdx]);
-          }
+          var conf = this.state.practice ? this.practiceSeq[this.practiceIdx] : this.gameSeq[this.gameIdx];
+          numberGrid = this.getNumberGrid(conf);
         }
         var feedback = (
           <span
@@ -142,23 +180,26 @@ var Game = React.createClass({
             {this.state.OX}
           </span>
         );
-        return(
-          <div>
-            {!this.state.targetDisplay ? feedback : numberGrid}
+        var button = this.getButton();
+        var gameType = null;
+        if(this.state.showGameType){
+          gameType = (
             <div
               style={{
-                height: this.state.responseHeight,
-                width: '100%',
-                position: 'absolute',
-                bottom: 0
-              }}>
-              <ResponseButton
-                text={text}
-                value={[0, 1]}
-                specs={{height: this.state.responseHeight}}
-                disabled={!this.state.targetDisplay}
-                callback={this.checkAnswer}/>
+                textAlign: 'center',
+                fontSize: this.state.maxSize/20,
+                marginTop: this.state.maxSize/6
+              }}
+            >
+              {this.state.currentGameType == 0 ? '숫자 갯수' : '숫자 크기'}
             </div>
+          );
+        }
+        return(
+          <div>
+            {gameType}
+            {!this.state.targetDisplay && !this.state.showGameType ? feedback : numberGrid}
+            {button}
           </div>
         );
       }
@@ -169,7 +210,8 @@ var Game = React.createClass({
     var reaction = parseInt(e.target.value);
     var OX;
     var nextGameType = this.state.currentGameType;
-    var stillPractice = this.state.practice;
+    //var stillPractice = this.state.practice;
+    var practiceDone = false;
     if(this.state.practice){
       if((this.practiceSeq[this.practiceIdx][this.state.currentGameType] > 5) == reaction){
         OX = '정답';
@@ -178,14 +220,15 @@ var Game = React.createClass({
       }
       this.practiceIdx += 1;
       if(this.practiceIdx == this.state.numberOfPractices){
-        stillPractice = false
+        //stillPractice = false;
+        practiceDone = true;
       }
-      if(stillPractice){
+      if(!practiceDone){
         if(this.practiceSwitchSeq[this.practiceIdx] > 0){
           nextGameType = (nextGameType+1)%2;
         }
       }else{
-          nextGameType = random(2);
+        nextGameType = random(2);
       }
     }else{
       this.userAnswers.push(reaction);
@@ -198,20 +241,40 @@ var Game = React.createClass({
     }
     this.setState({
       targetDisplay: false,
+      showGameType: false,
       OX: OX,
-      practice: stillPractice,
+      //practice: stillPractice,
+      practiceDone: practiceDone,
       currentGameType: nextGameType
     })
-    setTimeout(this.nextGame, this.state.interval);
+    if(!practiceDone){
+      setTimeout(this.nextGame, this.state.interval);
+    }
   },
   nextGame(){
+    this.setState({
+      countdown: false,
+      showGameType: true
+    });
+    setTimeout(this.startNextGame, 500);
+  },
+  startNextGame(){
     if(this.gameIdx == this.state.numberOfGames){
       this.endGame();
     }else{
-      this.setState({
-        targetDisplay: true,
-        OX: ''
-      })
+      if(this.state.practiceDone){
+        this.setState({
+          targetDisplay: true,
+          practice: false,
+          practiceDone: false,
+          OX: ''
+        });
+      }else{
+        this.setState({
+          targetDisplay: true,
+          OX: ''
+        });
+      }
     }
   },
   endGame(){
@@ -221,21 +284,33 @@ var Game = React.createClass({
       done: true
     });
   },
-  componentDidMount(){
-    var windowHeight = window.innerHeight;
-    var windowWidth = window.innerWidth;
-    var responseHeight = Math.max(windowHeight*0.2, 50);
-    var gridHeight = windowHeight - responseHeight;
-    this.setState({
-      responseHeight: responseHeight,
-      gridHeight: gridHeight,
-      gridWidth: windowWidth,
-      maxSize: Math.min(gridHeight, windowWidth)
-    })
-  },
+  //componentDidMount(){
+    //var windowHeight = window.innerHeight;
+    //var windowWidth = window.innerWidth;
+    //var responseHeight = Math.max(windowHeight*0.2, 50);
+    //var gridHeight = windowHeight - responseHeight;
+    //this.setState({
+      //responseHeight: responseHeight,
+      //gridHeight: gridHeight,
+      //gridWidth: windowWidth,
+      //maxSize: Math.min(gridHeight, windowWidth)
+    //})
+  //},
   componentDidUpdate(prevProps, prevState){
     if(!prevState.targetDisplay && this.state.targetDisplay){
       this.targetAppearedTime = Date.now();
+    }
+    var windowHeight = window.innerHeight;
+    var windowWidth = window.innerWidth;
+    var responseHeight = Math.max(windowHeight*0.2, 50);
+    if(this.state.responseHeight != responseHeight){
+      var gridHeight = windowHeight - responseHeight;
+      this.setState({
+        responseHeight: responseHeight,
+        gridHeight: gridHeight,
+        gridWidth: windowWidth,
+        maxSize: Math.min(gridHeight, windowWidth)
+      });
     }
   }
 });

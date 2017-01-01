@@ -11,6 +11,7 @@ var TableRow = React.createClass({
         <td>{this.props.stop}</td>
         <td>{this.props.userAnswer}</td>
         <td>{this.props.correct}</td>
+        <td>{this.props.delay}</td>
       </tr>
     );
   }
@@ -35,12 +36,14 @@ var Result = React.createClass({
   propTypes: {
     seq: React.PropTypes.array,
     stopSeq: React.PropTypes.array,
+    delays: React.PropTypes.array,
     userAnswers: React.PropTypes.array,
     corrects: React.PropTypes.array,
     fixation: React.PropTypes.number,
     blink: React.PropTypes.number,
     wait: React.PropTypes.number,
-    reset: React.PropTypes.func
+    reset: React.PropTypes.func,
+    home: React.PropTypes.func
   },
   getAvergeTr(){
     var cntOfLocations = counter(this.props.seq);
@@ -51,6 +54,8 @@ var Result = React.createClass({
       numberOfCorrects = 0;
     }
     var avgOfCorrects =  numberOfCorrects / this.props.corrects.length;
+    var validDelays = this.props.delays.filter((x) => x != '');
+    var avgOfDelays = validDelays.reduce((a, b) => a+b)/validDelays.length;
     return (
       <TableRow
         idx='avg.'
@@ -58,6 +63,7 @@ var Result = React.createClass({
         stop={makeString(cntOfStops)}
         userAnswer={makeString(cntOfAnswers)}
         correct={avgOfCorrects.toFixed(2)}
+        delay={avgOfDelays.toFixed(2)}
       />
     )
   },
@@ -71,8 +77,10 @@ var Result = React.createClass({
           idx={i+1}
           location={this.props.seq[i]}
           stop={this.props.stopSeq[i]}
+          delays={this.props.delays[i]}
           userAnswer={this.props.userAnswers[i]}
           correct={this.props.corrects[i]}
+          delay={this.props.delays[i]}
         />
       )
     }
@@ -95,6 +103,7 @@ var Result = React.createClass({
                 <th>정지신호(ms)</th>
                 <th>응답</th>
                 <th>정오</th>
+                <th>응답 시간</th>
               </tr>
             </thead>
             <tbody>
@@ -104,7 +113,8 @@ var Result = React.createClass({
           </Table>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.props.reset}>닫기</Button>
+          <Button onClick={this.props.reset}>새 게임</Button>
+          <Button onClick={this.props.home}>게임 선택</Button>
           <Button bsStyle="primary" onClick={this.sendResult} disabled={this.state.saved}>저장</Button>
         </Modal.Footer>
       </Modal.Dialog>

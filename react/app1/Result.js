@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table, Modal, Button } from 'react-bootstrap';
-import { makeUrl } from '../helpers'
+import { clone, makeUrl } from '../helpers'
 
 var TableRow = React.createClass({
   render(){
@@ -40,7 +40,8 @@ var Result = React.createClass({
     gameBoxSeq: React.PropTypes.array,
     gameAnswers: React.PropTypes.array,
     userAnswers: React.PropTypes.array,
-    reset: React.PropTypes.func
+    reset: React.PropTypes.func,
+    home: React.PropTypes.func
   },
   componentWillMount(){
     this.componentWillReceiveProps(this.props);
@@ -115,7 +116,8 @@ var Result = React.createClass({
           </Table>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.props.reset}>닫기</Button>
+          <Button onClick={this.props.reset}>새 게임</Button>
+          <Button onClick={this.props.home}>게임 선택</Button>
           <Button bsStyle="primary" onClick={this.sendResult} disabled={this.state.saved}>저장</Button>
         </Modal.Footer>
       </Modal.Dialog>
@@ -124,15 +126,8 @@ var Result = React.createClass({
   },
 
   sendResult(){
-    var obj = {
-      gameBoxSeq: this.props.gameBoxSeq,
-      gameAnswers: this.props.gameAnswers,
-      userAnswers: this.props.userAnswers,
-      corrects: this.corrects,
-      expose: this.props.expose,
-      blink: this.props.blink,
-      interval: this.props.interval
-    }
+    var obj = clone(this.props);
+    obj['corrects'] = this.corrects;
     var requestHeader = {
       method: 'POST',
       headers: {

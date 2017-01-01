@@ -45,7 +45,8 @@ var Result = React.createClass({
     userAnswers: React.PropTypes.array,
     gameTypes: React.PropTypes.array,
     delays: React.PropTypes.array,
-    reset: React.PropTypes.func
+    reset: React.PropTypes.func,
+    home: React.PropTypes.func
   },
   componentWillMount(){
     this.componentWillReceiveProps(this.props);
@@ -142,7 +143,8 @@ var Result = React.createClass({
           </Table>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.props.reset}>닫기</Button>
+          <Button onClick={this.props.reset}>새 게임</Button>
+          <Button onClick={this.props.home}>게임 선택</Button>
           <Button bsStyle="primary" onClick={this.sendResult} disabled={this.state.saved}>저장</Button>
         </Modal.Footer>
       </Modal.Dialog>
