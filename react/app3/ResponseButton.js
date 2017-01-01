@@ -16,6 +16,7 @@ var ResponseButton = React.createClass({
           value={this.props.value[0]}
           disabled={this.props.disabled}
           onClick={this.props.callback}
+          onTouchEnd={this.props.callback}
         >
           {this.props.text[0]}
         </Button>
@@ -24,6 +25,7 @@ var ResponseButton = React.createClass({
           value={this.props.value[1]}
           disabled={this.props.disabled}
           onClick={this.props.callback}
+          onTouchEnd={this.props.callback}
         >
           {this.props.text[1]}
         </Button>
