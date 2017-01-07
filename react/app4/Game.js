@@ -195,6 +195,26 @@ var Game = React.createClass({
         </div>
       );
     }else if(this.state.beforeNext){
+      var button;
+      if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+        button = (
+          <Button
+            style={{width:'100%', height:'100%', fontSize: this.state.responseHeight/2}}
+            onTouchStart={this.nextGame}
+          >
+            다음 게임
+          </Button>
+        );
+      }else{
+        button = (
+          <Button
+            style={{width:'100%', height:'100%', fontSize: this.state.responseHeight/2}}
+            onClick={this.nextGame}
+          >
+            다음 게임
+          </Button>
+        );
+      }
       return (
         <div
           style={{
@@ -203,11 +223,7 @@ var Game = React.createClass({
               position: 'absolute',
               bottom: 0
           }}>
-          <Button
-            style={{width:'100%', height:'100%', fontSize: this.state.responseHeight/2}}
-            onClick={this.nextGame} >
-            다음 게임
-          </Button>
+          {button}
         </div>
       );
     }else{
@@ -337,7 +353,7 @@ var Game = React.createClass({
       //practice: stillPractice
     })
   },
-  nextGame(){
+  nextGame(e){
     if(this.gameIdx == this.state.numberOfGames){
       this.endGame();
     }else{

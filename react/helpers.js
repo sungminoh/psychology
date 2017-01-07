@@ -95,13 +95,14 @@ function genPallet(pallet, n){
     var p = pickRandom(set);
     ret[p] = colors.pop();
     if(p%size != 0) set.delete(p-1);
-    if(p%size != n-1) set.delete(p+1);
-    if(parseInt(p/n) != 0) set.delete(p-n);
-    if(parseInt(p/n) != n-1) set.delete(p+n);
-    if(p%size != 0 && parseInt(p/n) != 0) set.delete(p-n-1);
-    if(p%size != n-1 && parseInt(p/n) != 0) set.delete(p-n+1);
-    if(p%size != 0 && parseInt(p/n) != n-1) set.delete(p+n-1);
-    if(p%size != n-1 && parseInt(p/n) != n-1) set.delete(p+n+1);
+    if(p%size != size-1) set.delete(p+1);
+    if(parseInt(p/size) != 0) set.delete(p-size);
+    if(parseInt(p/size) != size-1) set.delete(p+size);
+    if(p%size != 0 && parseInt(p/size) != 0) set.delete(p-size-1);
+    if(p%size != size-1 && parseInt(p/size) != 0) set.delete(p-size+1);
+    if(p%size != 0 && parseInt(p/size) != n-1) set.delete(p+size-1);
+    if(p%size != size-1 && parseInt(p/size) != n-1) set.delete(p+size+1);
+    set.delete(p);
   }
   return [ret, colors.pop()];
 }
