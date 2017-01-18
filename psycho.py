@@ -83,6 +83,7 @@ def app1Result():
                  '(test_id, boxes, is_changed, user_input, correct, '
                  'expose, blink, inter) '
                  'VALUES (%s, %s, %s, %s, %s, %s, %s, %s)')
+        print data
         g.db.cursor().executemany(query, data)
         g.db.commit()
         return jsonify(result='success')
@@ -94,9 +95,9 @@ def app1Result():
         data = fetch_data(query)
         return jsonify(result=data)
     elif request.method == 'DELETE':
-        query = ('DELETE FROM app1')
-        g.db.cursor().execute(query)
-        g.db.commit()
+        # query = ('DELETE FROM app1')
+        # g.db.cursor().execute(query)
+        # g.db.commit()
         return jsonify(result='success')
 
 
@@ -142,6 +143,7 @@ def app2Result():
                  delays[i]
                  )
                 for i in range(len(game_seq))]
+        print data
         query = ('INSERT INTO app2 '
                  '(test_id, letter, rotation, flip, '
                  'user_input, correct, delay) '
@@ -157,9 +159,9 @@ def app2Result():
         data = fetch_data(query)
         return jsonify(result=data)
     elif request.method == 'DELETE':
-        query = ('DELETE FROM app2')
-        g.db.cursor().execute(query)
-        g.db.commit()
+        # query = ('DELETE FROM app2')
+        # g.db.cursor().execute(query)
+        # g.db.commit()
         return jsonify(result='success')
 
 
@@ -223,9 +225,9 @@ def app3Result():
         data = fetch_data(query)
         return jsonify(result=data)
     elif request.method == 'DELETE':
-        query = ('DELETE FROM app3')
-        g.db.cursor().execute(query)
-        g.db.commit()
+        # query = ('DELETE FROM app3')
+        # g.db.cursor().execute(query)
+        # g.db.commit()
         return jsonify(result='success')
 
 
@@ -270,6 +272,7 @@ def app4Result():
                  seq[i], stop_seq[i], user_answers[i], corrects[i], delays[i],
                  fixation, blink, wait)
                 for i in range(len(seq))]
+        print data
         query = ('INSERT INTO app4 '
                  '(test_id, location, stop, user_input, correct, delay, '
                  'fixation, blink, wait) '
@@ -285,9 +288,9 @@ def app4Result():
         data = fetch_data(query)
         return jsonify(result=data)
     elif request.method == 'DELETE':
-        query = ('DELETE FROM app4')
-        g.db.cursor().execute(query)
-        g.db.commit()
+        # query = ('DELETE FROM app4')
+        # g.db.cursor().execute(query)
+        # g.db.commit()
         return jsonify(result='success')
 
 

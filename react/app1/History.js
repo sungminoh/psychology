@@ -68,6 +68,7 @@ var History = React.createClass({
     this.props.router.push({ pathname: makeUrl('/app1/game') });
   },
   requestRemoveAll(e){
+    alert('삭제는 잠시 금지되어 있습니다.'); return;
     fetch(makeUrl('/app1/result'), { method: 'DELETE', accept: 'application/json'})
       .then((response) => response.ok)
       .then((responseOk) => {
