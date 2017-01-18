@@ -246,6 +246,7 @@ var Game = React.createClass({
     }
   },
   checkAnswer(e){
+    if(!this.state.targetRedisplay){ return; }
     var reaction = parseInt(e.target.value);
     var OX;
     var practiceDone = false;

@@ -36,7 +36,8 @@ var NumberGrid = React.createClass({
     return (
       <div
         style={{
-          fontSize: size/10,
+          //fontSize: size/10,
+          fontSize: size/8,
           textAlign: 'center',
           marginTop: size/6
         }}>

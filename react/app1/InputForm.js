@@ -61,7 +61,7 @@ var InputForm = React.createClass({
       isValidInterval: true,
       blink: 900,
       isValidBlink: true,
-      expose: 100,
+      expose: 200,
       isValidExpose: true,
     };
   },

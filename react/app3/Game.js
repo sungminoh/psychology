@@ -187,7 +187,7 @@ var Game = React.createClass({
             <div
               style={{
                 textAlign: 'center',
-                fontSize: this.state.maxSize/20,
+                fontSize: this.state.maxSize/10,
                 marginTop: this.state.maxSize/6
               }}
             >
@@ -206,6 +206,7 @@ var Game = React.createClass({
     }
   },
   checkAnswer(e){
+    if(!this.state.targetDisplay){ return; }
     var delay = Date.now() - this.targetAppearedTime;
     var reaction = parseInt(e.target.value);
     var OX;

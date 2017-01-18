@@ -197,6 +197,7 @@ var Game = React.createClass({
     }
   },
   checkAnswer(e){
+    if(!this.state.targetDisplay){ return; }
     var delay = Date.now() - this.targetAppearedTime;
     var reaction = parseInt(e.target.value);
     var OX;

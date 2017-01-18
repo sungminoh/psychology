@@ -194,7 +194,27 @@ var Game = React.createClass({
           </Button>
         </div>
       );
-    }else if(this.state.beforeNext){
+    }else{
+      return (
+        <div
+          style={{
+            height: this.state.responseHeight,
+              width: '100%',
+              position: 'absolute',
+              bottom: 0
+          }}>
+          <ResponseButton
+            text={['왼쪽', '오른쪽']}
+            value={['left', 'right']}
+            specs={{height: this.state.responseHeight}}
+            disabled={!this.state.targetDisplay}
+            callback={this.checkAnswer}/>
+        </div>
+      )
+    }
+  },
+  getNextGameButton(){
+    if(this.state.beforeNext){
       var button;
       if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
         button = (
@@ -221,28 +241,11 @@ var Game = React.createClass({
             height: this.state.responseHeight,
               width: '100%',
               position: 'absolute',
-              bottom: 0
+              bottom: this.state.responseHeight
           }}>
           {button}
         </div>
       );
-    }else{
-      return (
-        <div
-          style={{
-            height: this.state.responseHeight,
-              width: '100%',
-              position: 'absolute',
-              bottom: 0
-          }}>
-          <ResponseButton
-            text={['왼쪽', '오른쪽']}
-            value={['left', 'right']}
-            specs={{height: this.state.responseHeight}}
-            disabled={!this.state.targetDisplay}
-            callback={this.checkAnswer}/>
-        </div>
-      )
     }
   },
   getStop(){
@@ -282,9 +285,11 @@ var Game = React.createClass({
           main = this.getFeedback();
         }
         var button = this.getButton();
+        var nextGameButton = this.getNextGameButton();
         return(
           <div>
             {main}
+            {nextGameButton}
             {button}
           </div>
         );
@@ -292,6 +297,7 @@ var Game = React.createClass({
     }
   },
   checkAnswer(e){
+    if(!this.state.targetDisplay){ return; }
     for(var i=0; i<this.timeoutList.length; i++){
       clearTimeout(this.timeoutList[i]);
     }
