@@ -123,5 +123,5 @@ chrome-user-data
 
 # application security
 db_info.py
-app.ini
+*.ini
 react/config.js

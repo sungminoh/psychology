@@ -181,6 +181,10 @@ var Result = React.createClass({
       .catch((error) => {
         alert('데이터가 정상적으로 저장되지 못하였습니다. 다시 시도하세요.');
       });
+  },
+
+  componentDidMount(){
+    this.sendResult();
   }
 });
 
