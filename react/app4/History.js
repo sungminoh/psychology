@@ -68,17 +68,18 @@ var History = React.createClass({
     this.props.router.push({ pathname: makeUrl('/app4/game') });
   },
   requestRemoveAll(e){
-    alert('삭제는 잠시 금지되어 있습니다.'); return;
-    fetch(makeUrl('/app4/result'), { method: 'DELETE', accept: 'application/json'})
-      .then((response) => response.ok)
-      .then((responseOk) => {
-        if(responseOk){
+    var password = prompt('비밀번호를 입력하세요.');
+    fetch(makeUrl('/app4/result'), { method: 'DELETE', accept: 'application/json', body: JSON.stringify({'password': password})})
+      .then((response) => {
+        if(response.status == 200){
           this.setState({fetched: false});
           alert('데이터를 성공적으로 삭제하였습니다.');
+        }else{
+          alert('데이터를 삭제할 수 없습니다.\n[' + response.statusText + ']');
         }
       })
       .catch((error) => {
-        alert('데이터를 삭제하는데 실패하였습니다. 다시 시도하세요.');
+        alert('데이터를 삭제하는데 실패하였습니다. 관리자에게 문의하세요.\n' + error.toString());
       });
   },
   render(){

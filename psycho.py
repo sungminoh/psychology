@@ -2,7 +2,7 @@
 from flask import Flask, render_template, request, Response, g, jsonify
 from ast import literal_eval as parseJson
 import MySQLdb as mdb
-from db_info import mysql_conf
+from db_info import mysql_conf, password
 from pdb import set_trace as bp
 import time
 
@@ -95,10 +95,15 @@ def app1Result():
         data = fetch_data(query)
         return jsonify(result=data)
     elif request.method == 'DELETE':
-        # query = ('DELETE FROM app1')
-        # g.db.cursor().execute(query)
-        # g.db.commit()
-        return jsonify(result='success')
+        request_data = parseJson(request.data)
+        if request_data['password'] == password:
+            query = ('DELETE FROM app1')
+            g.db.cursor().execute(query)
+            g.db.commit()
+            return Response(status=200)
+        else:
+            return Response(status=403)
+
 
 
 @app.route('/app1/download', methods=['GET'])
@@ -159,10 +164,14 @@ def app2Result():
         data = fetch_data(query)
         return jsonify(result=data)
     elif request.method == 'DELETE':
-        # query = ('DELETE FROM app2')
-        # g.db.cursor().execute(query)
-        # g.db.commit()
-        return jsonify(result='success')
+        request_data = parseJson(request.data)
+        if request_data['password'] == password:
+            query = ('DELETE FROM app2')
+            g.db.cursor().execute(query)
+            g.db.commit()
+            return Response(status=200)
+        else:
+            return Response(status=403)
 
 
 @app.route('/app2/download', methods=['GET'])
@@ -225,10 +234,14 @@ def app3Result():
         data = fetch_data(query)
         return jsonify(result=data)
     elif request.method == 'DELETE':
-        # query = ('DELETE FROM app3')
-        # g.db.cursor().execute(query)
-        # g.db.commit()
-        return jsonify(result='success')
+        request_data = parseJson(request.data)
+        if request_data['password'] == password:
+            query = ('DELETE FROM app3')
+            g.db.cursor().execute(query)
+            g.db.commit()
+            return Response(status=200)
+        else:
+            return Response(status=403)
 
 
 @app.route('/app3/download', methods=['GET'])
@@ -288,10 +301,14 @@ def app4Result():
         data = fetch_data(query)
         return jsonify(result=data)
     elif request.method == 'DELETE':
-        # query = ('DELETE FROM app4')
-        # g.db.cursor().execute(query)
-        # g.db.commit()
-        return jsonify(result='success')
+        request_data = parseJson(request.data)
+        if request_data['password'] == password:
+            query = ('DELETE FROM app4')
+            g.db.cursor().execute(query)
+            g.db.commit()
+            return Response(status=200)
+        else:
+            return Response(status=403)
 
 
 @app.route('/app4/download', methods=['GET'])
