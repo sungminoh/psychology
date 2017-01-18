@@ -3,14 +3,17 @@ import ReactDOM from 'react-dom';
 import fetch from 'whatwg-fetch';
 import { Button } from 'react-bootstrap';
 import { Router, Route, browserHistory, IndexRoute, Link } from 'react-router';
+
 import App1 from './app1/App1';
 import App2 from './app2/App2';
 import App3 from './app3/App3';
 import App4 from './app4/App4';
+import Nback from './nback/App';
+
 import { makeUrl } from './helpers';
 import { base } from './config';
 // test
-import Game from './app1/Game';
+import Game from './nback/Game';
 
 
 function Index(props){
@@ -29,7 +32,10 @@ var Selector = React.createClass({
         this.props.router.push({ pathname: makeUrl('/app3') });
     }else if(id == 4){
         this.props.router.push({ pathname: makeUrl('/app4') });
+    }else if(id == 5){
+        this.props.router.push({ pathname: makeUrl('/nback') });
     }
+
 
   },
   render(){
@@ -52,6 +58,9 @@ var Selector = React.createClass({
         <Button id={4} bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
           Stop Sginal Task
         </Button>
+        <Button id={5} bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
+          N-back
+        </Button>
       </div>
     )
   }
@@ -60,11 +69,11 @@ var Selector = React.createClass({
 
 const routes = {
   path: base,
-  component: Index,
-  //component: Game,
+  //component: Index,
+  component: Game,
   indexRoute: {component: Selector},
   childRoutes: [
-    App1, App2, App3, App4
+    App1, App2, App3, App4, Nback
   ]
 }
 
