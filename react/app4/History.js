@@ -14,6 +14,7 @@ var TableRow = React.createClass({
         <td>{this.props.stopSeq}</td>
         <td>{this.props.userInput}</td>
         <td>{this.props.correct}</td>
+        <td>{this.props.delay}</td>
         <td>{this.props.fixation}</td>
         <td>{this.props.blink}</td>
         <td>{this.props.wait}</td>
@@ -36,10 +37,11 @@ function  getList(data){
         stopSeq={row[2]}
         userInput={row[3]}
         correct={row[4]}
-        fixation={row[5]}
-        blink={row[6]}
-        wait={row[7]}
-        ts={row[8]}
+        delay={row[5]}
+        fixation={row[6]}
+        blink={row[7]}
+        wait={row[8]}
+        ts={row[9]}
       />
     )
   }
@@ -101,6 +103,7 @@ var History = React.createClass({
               <th>정지신호(ms)</th>
               <th>응답</th>
               <th>정답</th>
+              <th>반응 시간</th>
               <th>픽세이션(ms)</th>
               <th>공백 시간(ms)</th>
               <th>응답 대기 시간(ms)</th>
