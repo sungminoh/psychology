@@ -11,9 +11,9 @@ var InputForm = React.createClass({
     return {
       id: '',
       isValidId: false,
-      numberOfGames: 120,
+      numberOfGames: 96,
       isValidNumberOfGames: true,
-      numberOfPractices: 12,
+      numberOfPractices: 10,
       isValidNumberOfPractices: true,
       ratio: 25,
       isValidRatio: true,

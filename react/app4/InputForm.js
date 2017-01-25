@@ -12,9 +12,9 @@ var InputForm = React.createClass({
     return {
       id: '',
       isValidId: false,
-      numberOfGames:120,
+      numberOfGames:96,
       isValidNumberOfGames: true,
-      numberOfPractices: 12,
+      numberOfPractices: 10,
       isValidNumberOfPractices: true,
       stopDelay: 300,
       isValidStopDelay: true,
@@ -24,7 +24,7 @@ var InputForm = React.createClass({
       isValidFixation: true,
       blink: 200,
       isValidBlink: true,
-      wait: 1000,
+      wait: 1500,
       isValidWait: true,
     };
   },

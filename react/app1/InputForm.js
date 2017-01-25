@@ -51,7 +51,7 @@ var InputForm = React.createClass({
       isValidLength: true,
       numberOfGames: 64,
       isValidNumberOfGames: true,
-      numberOfPractices: 12,
+      numberOfPractices: 10,
       isValidNumberOfPractices: true,
       boxesOfGame: new Set([2,4,6,8]),
       boxesOfGameSize: 4,
@@ -61,7 +61,7 @@ var InputForm = React.createClass({
       isValidInterval: true,
       blink: 900,
       isValidBlink: true,
-      expose: 200,
+      expose: 300,
       isValidExpose: true,
     };
   },

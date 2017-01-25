@@ -39,9 +39,9 @@ var InputForm = React.createClass({
     return {
       id: '',
       isValidId: false,
-      numberOfGames: 48,
+      numberOfGames: 64,
       isValidNumberOfGames: true,
-      numberOfPractices: 12,
+      numberOfPractices: 10,
       isValidNumberOfPractices: true,
       rotations: new Set([0,60,120,180,240,300]),
       rotationsSize: 4,
