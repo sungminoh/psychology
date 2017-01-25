@@ -26,8 +26,8 @@ var InputForm = React.createClass({
       isValidExpose: true,
       blink: 200,
       isValidBlink: true,
-      wait: 1000,
-      isValidWait: true,
+      interval: 1000,
+      isValidInterval: true,
     };
   },
 
@@ -90,10 +90,10 @@ var InputForm = React.createClass({
     this.setState({ blink: e.target.value });
   },
 
-  changeWait(e) {
+  changeInterval(e) {
     const parsedValue = parseInt(e.target.value);
-    this.setState({isValidWait: !isNaN(parsedValue) && parsedValue >= 0});
-    this.setState({ wait: e.target.value });
+    this.setState({isValidInterval: !isNaN(parsedValue) && parsedValue >= 0});
+    this.setState({ interval: e.target.value });
   },
 
   startGame(){
@@ -158,24 +158,13 @@ var InputForm = React.createClass({
           <FormControl.Feedback/>
         </FormGroup>
         {' '}
-        <FormGroup validationState={this.getValidationState('isValidStopDelay')} >
-          <ControlLabel>정지신호 제시 시점:</ControlLabel>
+        <FormGroup validationState={this.getValidationState('isValidHitRatio')} >
+          <ControlLabel>일치 비율(%):</ControlLabel>
           {' '}
           <FormControl
             type='number'
-            placeholder={this.state.stopDelay}
-            onChange={this.changeStopDelay}
-          />
-          <FormControl.Feedback/>
-        </FormGroup>
-        {' '}
-        <FormGroup validationState={this.getValidationState('isValidStopRatio')} >
-          <ControlLabel>정지신호 제시 비율(%):</ControlLabel>
-          {' '}
-          <FormControl
-            type='number'
-            placeholder={this.state.stopRatio}
-            onChange={this.changeStopRatio}
+            placeholder={this.state.hitRatio}
+            onChange={this.changeHitRatio}
           />
           <FormControl.Feedback/>
         </FormGroup>
@@ -183,11 +172,15 @@ var InputForm = React.createClass({
         <Button
           onClick={this.startGame}
           disabled={
-            !this.state.isValidNumberOfGames
-              || !this.state.isValidId
-              || !this.state.isValidNumberOfPractices
-              || !this.state.isValidStopDelay
-              || !this.state.isValidStopRatio
+            !this.state.isValidId
+            || !this.state.isValidNumberOfGames
+            || !this.state.isValidNumberOfTrialsPerGame
+            || !this.state.isValidNumberOfPractices
+            || !this.state.isValidNumberOfTrialsPerPractice
+            || !this.state.isValidHitRatio
+            || !this.state.isValidExpose
+            || !this.state.isValidBlink
+            || !this.state.isValidInterval
           }
         >
           시작
@@ -195,19 +188,19 @@ var InputForm = React.createClass({
         {' '}
         {this.props.additionalButtons}
         {' '}
-        <FormGroup validationState={this.getValidationState('isValidFixation')} >
-          <ControlLabel>픽세이션:</ControlLabel>
+        <FormGroup validationState={this.getValidationState('isValidExpose')} >
+          <ControlLabel>노출 시간:</ControlLabel>
           {' '}
           <FormControl
             type='number'
-            placeholder={this.state.fixation}
-            onChange={this.changeFixation}
+            placeholder={this.state.expose}
+            onChange={this.changeExpose}
           />
           <FormControl.Feedback/>
         </FormGroup>
         {' '}
         <FormGroup validationState={this.getValidationState('isValidBlink')} >
-          <ControlLabel>빈 화면:</ControlLabel>
+          <ControlLabel>빈화면 시간:</ControlLabel>
           {' '}
           <FormControl
             type='number'
@@ -217,13 +210,13 @@ var InputForm = React.createClass({
           <FormControl.Feedback/>
         </FormGroup>
         {' '}
-        <FormGroup validationState={this.getValidationState('isValidWait')} >
-          <ControlLabel>응답 대기 시간:</ControlLabel>
+        <FormGroup validationState={this.getValidationState('isValidInterval')} >
+          <ControlLabel>간격 시간:</ControlLabel>
           {' '}
           <FormControl
             type='number'
-            placeholder={this.state.wait}
-            onChange={this.changeWait}
+            placeholder={this.state.interval}
+            onChange={this.changeInterval}
           />
           <FormControl.Feedback/>
         </FormGroup>

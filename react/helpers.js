@@ -215,6 +215,30 @@ function genStopSeq(n, ratio, delay){
   return d3.shuffle(arr.concat(stopSeq));
 }
 
+function genNBackSeq(n, ratio, nback){
+  var hitArr = arrRepeat(false, n)
+  for(let i=0; i<Math.round(n * ratio / 100); i++){
+    hitArr[i] = true;
+  }
+  hitArr = arrRepeat(null, nback).concat(d3.shuffle(arr));
+  var ret = new Array(hitArr.length);
+  for(let i=0; i<nback; i++){
+    ret[i] = random(0, 10);
+  }
+  for(let i=nback; i<ret.length; i++){
+    if(hitArr[i]){
+      ret[i] = ret[i-nback];
+    }else{
+      var candidate = random(0, 9);
+      if (candidate == ret[i-nback]){
+        candidate = 9;
+      }
+      ret[i] = candidate;
+    }
+  }
+  return ret;
+}
+
 module.exports = {
 	random: random,
   counter: counter,
@@ -234,4 +258,5 @@ module.exports = {
   genNumbers: genNumbers,
   // for app4
   genStopSeq: genStopSeq
+  // for N back
 };
