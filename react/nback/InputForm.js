@@ -3,6 +3,22 @@ import Checkbox from 'rc-checkbox';
 import { Form, FormGroup, ControlLabel, FormControl, Button, Row, Grid, Col} from 'react-bootstrap';
 import 'rc-checkbox/assets/index.css';
 
+var NbackCheckboxGroup = React.createClass({
+  render(){
+    return(
+      <Grid>
+        <Col xs={1}><label><Checkbox className='nbacks' onChange={this.props.onChange} value={1} defaultChecked /><br/>1</label> {' '}</Col>
+        <Col xs={1}><label><Checkbox className='nbacks' onChange={this.props.onChange} value={2} defaultChecked /><br/>2</label> {' '}</Col>
+        <Col xs={1}><label><Checkbox className='nbacks' onChange={this.props.onChange} value={3} defaultChecked /><br/>3</label> {' '}</Col>
+        <Col xs={1}><label><Checkbox className='nbacks' onChange={this.props.onChange} value={4} /><br/>4</label> {' '}</Col>
+        <Col xs={1}><label><Checkbox className='nbacks' onChange={this.props.onChange} value={5} /><br/>5</label>{' '}</Col>
+        <Col xs={1}><label><Checkbox className='nbacks' onChange={this.props.onChange} value={6} /><br/>6</label>{' '}</Col>
+      </Grid>
+    );
+  }
+});
+
+
 var InputForm = React.createClass({
   PropTypes: {
     onClick: React.PropTypes.func.isRequired
@@ -20,6 +36,8 @@ var InputForm = React.createClass({
       isValidNumberOfPractices: true,
       numberOfTrialsPerPractice: 12,
       isValidNumberOfTrialsPerPractice: true,
+      nbacks: new Set([1,2,3]),
+      nbacksSize: 3,
       hitRatio: 25,
       isValidHitRatio: true,
       expose: 800,
@@ -78,6 +96,20 @@ var InputForm = React.createClass({
     this.setState({ hitRatio: e.target.value });
   },
 
+  changeCheckbox(e){
+    var name = e.target.className;
+    var checked = e.target.checked;
+    var value = e.target.value;
+    if(checked){
+      this.state[name].add(value);
+    }else{
+      this.state[name].delete(value);
+    }
+    var stateObj = {};
+    stateObj[name+'Size'] = this.state[name].size;
+    this.setState(stateObj);
+  },
+
   changeExpose(e) {
     const parsedValue = parseInt(e.target.value);
     this.setState({isValidExpose: !isNaN(parsedValue) && parsedValue >= 0});
@@ -114,7 +146,7 @@ var InputForm = React.createClass({
           <FormControl.Feedback/>
         </FormGroup>
         {' '}
-        <FormGroup validationState={this.getValidationState('isValidNumberOfGames')} >
+        <FormGroup validationState={this.getValidationState('nbacks')} >
           <ControlLabel>게임 횟수:</ControlLabel>
           {' '}
           <FormControl
@@ -126,7 +158,7 @@ var InputForm = React.createClass({
         </FormGroup>
         {' '}
         <FormGroup validationState={this.getValidationState('isValidNumberOfTrialsPerGame')} >
-          <ControlLabel>게임당 횟수:</ControlLabel>
+          <ControlLabel>게임 길이:</ControlLabel>
           {' '}
           <FormControl
             type='number'
@@ -148,7 +180,7 @@ var InputForm = React.createClass({
         </FormGroup>
         {' '}
         <FormGroup validationState={this.getValidationState('isValidNumberOfTrialsPerPractice')} >
-          <ControlLabel>연습당 횟수:</ControlLabel>
+          <ControlLabel>연습 길이:</ControlLabel>
           {' '}
           <FormControl
             type='number'
@@ -177,6 +209,7 @@ var InputForm = React.createClass({
             || !this.state.isValidNumberOfTrialsPerGame
             || !this.state.isValidNumberOfPractices
             || !this.state.isValidNumberOfTrialsPerPractice
+            || !this.state.nbacksSize
             || !this.state.isValidHitRatio
             || !this.state.isValidExpose
             || !this.state.isValidBlink
@@ -187,6 +220,15 @@ var InputForm = React.createClass({
         </Button>
         {' '}
         {this.props.additionalButtons}
+        {' '}
+        <FormGroup validationState={this.getValidationState('nbacksSize')}>
+          <ControlLabel>자극:</ControlLabel> {' '}
+          {' '}
+          <FormControl
+            componentClass={NbackCheckboxGroup}
+            onChange={this.changeCheckbox}
+          />
+        </FormGroup>
         {' '}
         <FormGroup validationState={this.getValidationState('isValidExpose')} >
           <ControlLabel>노출 시간:</ControlLabel>

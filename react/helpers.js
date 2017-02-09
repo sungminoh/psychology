@@ -215,12 +215,12 @@ function genStopSeq(n, ratio, delay){
   return d3.shuffle(arr.concat(stopSeq));
 }
 
-function genNBackSeq(n, ratio, nback){
-  var hitArr = arrRepeat(false, n)
-  for(let i=0; i<Math.round(n * ratio / 100); i++){
+function genNBackSeq(trials, ratio, nback){
+  var hitArr = arrRepeat(false, trials)
+  for(let i=0; i<Math.round(trials * ratio / 100); i++){
     hitArr[i] = true;
   }
-  hitArr = arrRepeat(null, nback).concat(d3.shuffle(arr));
+  hitArr = arrRepeat(null, nback).concat(d3.shuffle(hitArr));
   var ret = new Array(hitArr.length);
   for(let i=0; i<nback; i++){
     ret[i] = random(0, 10);
@@ -230,33 +230,22 @@ function genNBackSeq(n, ratio, nback){
       ret[i] = ret[i-nback];
     }else{
       var candidate = random(0, 9);
-      if (candidate == ret[i-nback]){
-        candidate = 9;
-      }
-      ret[i] = candidate;
+      ret[i] = (candidate == ret[i-nback]) ? 9 : candidate
     }
   }
-  return ret;
+  return ret, hitArr;
 }
 
 module.exports = {
-	random: random,
-  counter: counter,
-	clone: clone,
-  arrRepeat: arrRepeat,
-  genSeq: genSeq,
-  makeUrl: makeUrl,
+	random, counter, clone, arrRepeat, genSeq, makeUrl,
   // for app1
-  toHex: toHex,
-  genPallet: genPallet,
-  randomColorPos: randomColorPos,
+  toHex, genPallet, randomColorPos,
   // for app2
-  genPossibles: genPossibles,
+  genPossibles,
   // for app3
-  genMaintains: genMaintains,
-  genSwitchSeq: genSwitchSeq,
-  genNumbers: genNumbers,
+  genMaintains, genSwitchSeq, genNumbers,
   // for app4
-  genStopSeq: genStopSeq
+  genStopSeq,
   // for N back
+  genNBackSeq
 };
