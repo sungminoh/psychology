@@ -44,8 +44,8 @@ var InputForm = React.createClass({
       isValidExpose: true,
       blink: 200,
       isValidBlink: true,
-      interval: 1000,
-      isValidInterval: true,
+      //interval: 1000,
+      //isValidInterval: true,
     };
   },
 
@@ -122,11 +122,11 @@ var InputForm = React.createClass({
     this.setState({ blink: e.target.value });
   },
 
-  changeInterval(e) {
-    const parsedValue = parseInt(e.target.value);
-    this.setState({isValidInterval: !isNaN(parsedValue) && parsedValue >= 0});
-    this.setState({ interval: e.target.value });
-  },
+  //changeInterval(e) {
+    //const parsedValue = parseInt(e.target.value);
+    //this.setState({isValidInterval: !isNaN(parsedValue) && parsedValue >= 0});
+    //this.setState({ interval: e.target.value });
+  //},
 
   startGame(){
     this.props.onClick(this.state);
@@ -213,7 +213,7 @@ var InputForm = React.createClass({
             || !this.state.isValidHitRatio
             || !this.state.isValidExpose
             || !this.state.isValidBlink
-            || !this.state.isValidInterval
+            //|| !this.state.isValidInterval
           }
         >
           시작
@@ -251,19 +251,22 @@ var InputForm = React.createClass({
           />
           <FormControl.Feedback/>
         </FormGroup>
-        {' '}
-        <FormGroup validationState={this.getValidationState('isValidInterval')} >
-          <ControlLabel>간격 시간:</ControlLabel>
-          {' '}
-          <FormControl
-            type='number'
-            placeholder={this.state.interval}
-            onChange={this.changeInterval}
-          />
-          <FormControl.Feedback/>
-        </FormGroup>
       </Form>
     );
+      /*
+    ({' '}
+      <FormGroup validationState={this.getValidationState('isValidInterval')} >
+        <ControlLabel>간격 시간:</ControlLabel>
+        {' '}
+        <FormControl
+          type='number'
+          placeholder={this.state.interval}
+          onChange={this.changeInterval}
+        />
+        <FormControl.Feedback/>
+      </FormGroup>)
+      */
+
   }
 });
 

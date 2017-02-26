@@ -233,7 +233,7 @@ function genNBackSeq(trials, ratio, nback){
       ret[i] = (candidate == ret[i-nback]) ? 9 : candidate
     }
   }
-  return ret, hitArr;
+  return [ret, hitArr];
 }
 
 module.exports = {

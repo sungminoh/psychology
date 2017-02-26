@@ -11,96 +11,227 @@ import { clone, random, makeUrl, genNBackSeq } from '../helpers';
 import { Button, Grid, Row, Col } from 'react-bootstrap';
 
 
-var locations = ['left', 'right'];
-
 var Game = React.createClass({
-  getInitialState() {
+  getInitialState() { // component states
     return {
+      // game status
       game: false,
+      gameDone: false,
+      gameTrialsDone: false,
+      practice: false,
+      practiceDone: false,
+      practiceTrialsDone: false,
       countdown: false,
-      targetDisplay: false,
-      practice: true,
-      done: false,
-      id: '',
-      numberOfGames: 0,
-      numberOfTrialsPerGame: 0,
-      numberOfPractices: 0,
-      numberOfTrialsPerPractice: 0,
-      expose: 0,
-      blink: 0,
-      wait: 0,
+      numberDisplay: false,
+      beforeN: true,
+      // for game panel size
       responseHeight: 0,
       gridHeight: 0,
       gridWidth: 0,
       maxSize: 0,
-      interval: 1000,
-      OX: ''
     };
   },
-  practiceIdx: null,
-  gameIdx: null,
-  practiceSeq: null,
-  gameSeq: null,
-  practiceAnswers: null,
-  gameAnswers: null,
-  userAnswers: null,
-  gameNbacks: null,
-  currentGameNback: 0,
-  currentPracticeNback: 0,
-  practiceNbacks: null,
-  corrects: null,
-  componentWillMount(){
-    this.practiceIdx= 0;
-    this.gameIdx= 0;
-    this.practiceSeq = [];
-    this.gameSeq = [];
-    this.userAnswers = [];
-    this.corrects= [];
+  componentWillMount(){ // component attributes
+    // from inputbox
+    this.id = '';
+    this.numberOfGames = 0;
+    this.numberOfTrialsPerGame = 0;
+    this.numberOfPractices = 0;
+    this.numberOfTrialsPerPractice = 0;
+    this.expose = 0;
+    this.blink = 0;
+    // game information
+    this.gameNbackTypes = [];
+    this.currentGameNback = 0;
+    this.gameIdx = 0;
+    this.gameNumberSeq = [];
+    this.gameHitSeq = [];
+    // practice information
+    this.practiceNbackTypes = [];
+    this.currentPracticeNback = 0;
+    this.practiceIdx = 0;
+    this.practiceNumberSeq = [];
+    this.practiceHitSeq = [];
+    // user answers
+    this.selectedReaction = '';
+    this.userReactions = [];
+    this.userAnwers = [];
+    // to handle timeouts
+    this.timeoutList = [];
   },
   resetComponent(){
     this.setState(this.getInitialState());
     this.componentWillMount();
-    //this.componentDidMount();
   },
-  startGame(props){
-    var nbacks = Array.from(props.nbacks).sort();
-    this.gameNbacks = nbacks.slice();
-    this.currentGameNback= this.gameNbacks.shift();
-    [this.gameSeq, this.gameAnswers] = genNBackSeq(props.numberOfTrialsPerGame, props.hitRatio, this.currentGameNback);
-
-    this.practiceNbacks= nbacks.slice();
-    this.currentPracticeNback= this.practiceNbacks.shift();
-    [this.practiceSeq, this.practiceAnswers] = genNBackSeq(props.numberOfTrialsPerPractice, props.numberOfPractices, this.currentPracticeNback);
-
-    this.setState({
-      game: true,
-      countdown: true,
-      targetDisplay: false,
-      done: false,
-      id: props.id,
-      practice: props.numberOfPractices == '0' ? false : true,
-      numberOfGames: props.numberOfGames,
-      numberOfTrialsPerGame: props.numberOfTrialsPerGame,
-      numberOfPractices: props.numberOfPractices,
-      numberOfTrialsPerPractice: props.numberOfTrialsPerPractice,
-      expose: props.expose,
-      blink: props.blink,
-      wait: props.wait
-    });
-  },
-
   redirectToHistory(e){
     this.props.router.push({ pathname: makeUrl('/nback/history') });
   },
+  getInputForm(){
+    var historyButton = ( <Button onClick={this.redirectToHistory} > 기록 보기 </Button>);
+    return ( <InputForm onClick={this.onClickStart} additionalButtons={historyButton} />);
+  },
+  setAttrByObj(obj){
+    for(var key in obj){
+      if(key in this){
+        this[key] = obj[key];
+      }
+    }
+  },
+  onClickStart(props){ // triggered by inputform
+    var nbacks = Array.from(props.nbacks).sort();
+    this.gameNbackTypes = nbacks.slice();
+    this.practiceNbackTypes = nbacks.slice();
+    this.setAttrByObj(props)
+    this.setState({
+      // game status (game, practice are mutualy exclusive)
+      game: props.numberOfPractices == '0' ? true : false,
+      gameDone: false,
+      gameTrialsDone: false,
+      practice: props.numberOfPractices == '0' ? false: true,
+      practiceDone: false,
+      practiceTrialsDone: false,
+      countdown: true,
+      numberDisplay: false,
+      beforeN: true,
+    });
+  },
+  getCountdownTimer(s){
+    return <CountdownTimer sec={s} onExpired={this.startTrials} />;
+  },
+  startTrials(){
+    if(this.state.game){
+      this.currentGameNback = this.gameNbackTypes.shift();
+      [this.gameNumberSeq, this.gameHitSeq] = genNBackSeq(this.numberOfTrialsPerGame, this.hitRatio, this.currentGameNback);
+    }else if(this.state.practice){
+      this.currentPracticeNback= this.practiceNbackTypes.shift();
+      [this.practiceNumberSeq, this.practiceHitSeq] = genNBackSeq(this.numberOfTrialsPerPractice, this.numberOfPractices, this.currentPracticeNback);
+    }
+    this.setState({
+      numberDisplay: true,
+      countdown: false,
+    });
+  },
+  render(){
+    // before start game, get inputs
+    if(!this.state.game && !this.state.practice){
+      return this.getInputForm();
+    }
+    // after end of game, show results
+    if(this.state.gameDone){
+      return this.getResult();
+    }
+    // countdown
+    if(this.state.countdown){
+      return <div> {this.getCountdownTimer(0)} </div>;
+    }
+    // game or practice
+    return(
+      <div>
+        {this.state.numberDisplay ? this.getNumber() : null}
+        {this.getButton()}
+      </div>
+    );
+  },
+  getNumber(){
+    var number;
+    if(this.state.practice){
+      number = <div>{this.practiceNumberSeq[this.practiceIdx]}</div>
+    }else if(this.state.game){
+      number = <div>{this.gameNumberSeq[this.gameIdx]}</div>
+    }
+    return number;
+  },
+  /*
+   * during game or practice, there are a few phases
+   * (before N -> doing trials -> end of trials set) many times -> done with all practices ->
+   * (before N -> doing trials -> end of trials set) many times -> done with all games
+   */
+  getButton(){
+    var divStyle = {
+      height: this.state.responseHeight,
+      width: '100%',
+      position: 'absolute',
+      bottom: 0
+    };
+    var buttonStyle = {
+      width:'100%',
+      height:'100%',
+      fontSize: this.state.responseHeight/2
+    }
+    // done with all practices
+    if(this.state.practiceDone){
+      var buttonStyleRed = clone(buttonStyle);
+      buttonStyleRed['color'] = 'red';
+      return (
+        <div style={divStyle}>
+          <Button style={buttonStyleRed} onClick={this.startGame} > 게임 시작 </Button>
+        </div>
+      );
+    }
+    // end of trials set
+    if(this.state.practiceTrials || this.state.gameTrials){
+      var button;
+      if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+        button = <Button style={buttonStyle} onTouchStart={this.startTrials} > 다음 게임 </Button>;
+      }else{
+        button = <Button style={buttonStyle} onClick={this.startTrials} > 다음 게임 </Button>;
+      }
+      return <div style={divStyle}> {button} </div>;
+    }
+    // before N (this current trial is an introduction)
+    if(this.state.beforeN){
+      return (
+        <div style={divStyle}>
+          <Button style={buttonStyle} value='next' onClick={this.nextNumber}> 다음 </Button>
+        </div>
+      );
+    }
+    // doing trials
+    return (
+      <div style={divStyle}>
+        <ResponseButton
+          text={['일치', '불일치']}
+          value={['same', 'different']}
+          specs={{height: this.state.responseHeight}}
+          callback={x => this.selectedReaction = x}/>
+      </div>
+    );
+  },
+  startGame(){
+    this.setState({
+      game: true,
+      practice: false,
+      practiceDone: false,
+    })
+    this.startTrials();
+  },
+  nextNumber(){
+    for(var timeout in this.timeoutList){
+      clearTimeout(timeout);
+    }
+    this.checkAnswer();
+  },
+  checkAnswer(e){
+  },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   redirectToHome(){
     this.props.router.push({ pathname: makeUrl('/') });
   },
-
-  getInputForm(){
-    var historyButton = ( <Button onClick={this.redirectToHistory} > 기록 보기 </Button>);
-    return ( <InputForm onClick={this.startGame} additionalButtons={historyButton} />);
-  },
-
   getResult(){
     return (
       <Result
@@ -117,9 +248,6 @@ var Game = React.createClass({
     );
   },
 
-  getCountdownTimer(s){
-    return <CountdownTimer sec={s} onExpired={x => {this.setState({ countdown: false, targetDisplay: true});}} />;
-  },
   getFeedback(){
     return (<span
       style={{
@@ -132,180 +260,24 @@ var Game = React.createClass({
     </span>
     );
   },
-  getButton(){
-    var divStyle = {
-      height: this.state.responseHeight,
-      width: '100%',
-      position: 'absolute',
-      bottom: 0
-    };
-    var buttonStyle = {width:'100%', height:'100%', fontSize: this.state.responseHeight/2}
-    if(!this.state.practice){
-      var buttonStyleRed = clone(buttonStyle);
-      buttonStyleRed['color'] = 'red';
-      return (
-        <div style={divStyle}>
-          <Button style={buttonStyleRed} onClick={this.nextGame} > 게임 시작 </Button>
-        </div>
-      );
-    }else if(this.state.beforeNext){
-      var button;
-      if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-        button = <Button style={buttonStyle} onTouchStart={this.nextGame} > 다음 게임 </Button>;
-      }else{
-        button = <Button style={buttonStyle} onClick={this.nextGame} > 다음 게임 </Button>;
-      }
-      return <div style={divStyle}> {button} </div>;
-    }else{
-      var beforeStart = (this.state.practice && this.currentPracticeNback > this.practiceIdx) || (!this.state.practice && this.currentGameNback > this.gameIdx);
-      if (beforeStart){
-        return (
-          <div style={divStyle}>
-            <Button style={buttonStyle} value='next' onClick={this.nextGame}> 다음 </Button>
-          </div>
-        );
-
-      }else{
-        return (
-          <div style={divStyle}>
-            <ResponseButton
-              text={['일치', '불일치']}
-              value={['same', 'different']}
-              specs={{height: this.state.responseHeight}}
-              disabled={!this.state.targetDisplay}
-              callback={this.checkAnswer}/>
-          </div>
-        )
-      }
-    }
-  },
-
-  getTarget(){
-    if(this.state.practice){
-      return <div>{this.practiceSeq[this.practiceIdx ++]}</div>
-    }else{
-      return <div>{this.gameSeq[this.gameIdx ++]}</div>
-    }
-  },
-
-  render(){
-    if(!this.state.game){
-      if(!this.state.done){
-        return this.getInputForm();
-      }else{
-        return this.getResult();
-      }
-    }else{
-      if(this.state.countdown){
-        var countdownTimer = this.getCountdownTimer(3);
-        return ( <div> {countdownTimer} </div> );
-      }else{
-        var button = this.getButton();
-        var target = this.getTarget();
-        return(
-          <div>
-            {target}
-            {button}
-          </div>
-        );
-      }
-    }
-  },
-  checkAnswer(e){
-
-    if(!this.state.targetDisplay){ return; }
-    //var stillPractice = this.state.practice;
-    var practiceDone = false;
-    if(this.state.practice){
-      if(this.practiceSeq[this.practiceIdx][0] == reaction){
-        OX = '정답';
-      }else{
-        OX = '오답';
-      }
-      this.practiceIdx += 1;
-      if(this.practiceIdx == this.state.numberOfPractices){
-        //stillPractice = false;
-        practiceDone = true;
-      }
-    }else{
-      this.userAnswers.push(reaction);
-      this.delays.push(delay);
-      this.gameIdx += 1;
-    }
-    this.setState({
-      targetDisplay: false,
-      OX: OX,
-      //practice: stillPractice
-      practiceDone: practiceDone
-    })
-    if(!practiceDone){
-      setTimeout(this.nextGame, this.state.interval);
-    }
-
-
-
-    var reaction = e? e.target.value : 'none';
-
-    if(reaction == 'next'){
-      setTimeout(this.nextGame, this.state.interval);
-      this.setState({
-        targetDisplay: false
-      })
-    }
-
-    var hitArr = this.state.practice? this.practiceAnswers : this.gameAnswers;
-    var idx = this.state.practice? this.practiceIDx : this.gameIdx;
-
-    var OX;
-    if(reaction == 'none'){
-      OX = '미응답'
-    }else if((reaction == 'same' && hitArr[idx]) || (reaction == 'different' && !hitArr[idx])){
-      OX = '정답';
-    }else{
-      OX = '오답';
-    }
-
-    var practiceDone = false;
-    if(this.state.practice){
-      this.practiceIdx += 1;
-      if(this.practiceIdx == this.practiceSeq.length){
-        if(this.practiceNbacks.length == 0){
-          practiceDone = true;
-        }else{
-          this.currentPracticeNback = this.practiceNbacks.shift();
-          this.practiceIdx = 0;
-          [this.practiceSeq, this.practiceAnswers] = genNBackSeq(this.state.numberOfTrialsPerPractice, this.state.hitRatio, this.currentPracticeNback)
-        }
-      }
-    }else{ // !this.state.practice
-      this.userAnswers.push(reaction);
-      this.corrects.push(OX);
-      OX = '';
-      this.gameIdx += 1;
-    }
-    this.setState({
-      targetDisplay: false,
-      targetHide: false,
-      targetRedisplay: false,
-      beforeNext: true,
-      OX: OX,
-      practiceDone: practiceDone
-      //practice: stillPractice
-    })
-  },
   nextGame(e){
     if(this.gameNbacks.length == 0){
+      // if all the games are over
       this.endGame();
     }else{
-      if(this.state.practice){
+      var beforeStart = (this.state.practice && this.currentPracticeNback > this.practiceIdx) || (!this.state.practice && this.currentGameNback > this.gameIdx);
+      if(this.state.practiceDone){
         this.setState({
-          targetDisplay: true,
+          beforeNext: false,
+          numberDisplay: true,
+          practice: false,
+          practiceDone: false,
           OX: ''
         });
       }else{
         this.setState({
-          targetDisplay: false,
-          practice: false,
+          beforeNext: false,
+          numberDisplay: true,
           OX: ''
         });
       }
@@ -314,18 +286,12 @@ var Game = React.createClass({
   endGame(){
     this.setState({
       game: false,
-      fixationDisplay: false,
-      fixationHide: false,
-      targetDisplay: false,
-      stopDisplay: false,
+      numberDisplay: false,
       beforeNext: false,
       done: true
     });
   },
-  componentDidUpdate(prevProps, prevState){
-    if(!prevState.targetDisplay && this.state.targetDisplay){
-      this.targetAppearedTime = Date.now();
-    }
+  setWindowSize(){
     var windowHeight = window.innerHeight;
     var windowWidth = window.innerWidth;
     var responseHeight = Math.max(windowHeight*0.2, 50);
@@ -339,18 +305,15 @@ var Game = React.createClass({
       });
     }
   },
-  //componentDidMount(){
-  //var windowHeight = window.innerHeight;
-  //var windowWidth = window.innerWidth;
-  //var responseHeight = Math.max(windowHeight*0.2, 50);
-  //var gridHeight = windowHeight - responseHeight;
-  //this.setState({
-  //responseHeight: responseHeight,
-  //gridHeight: gridHeight,
-  //gridWidth: windowWidth,
-  //maxSize: Math.min(gridHeight, windowWidth)
-  //})
-  //}
+  componentDidUpdate(prevProps, prevState){
+    if(!prevState.numberDisplay && this.state.numberDisplay){
+      this.timeoutList.push(setTimeout(x => {this.setState({numberDisplay: false});}, this.expose));
+    }
+    if(prevState.numberDisplay && !this.state.numberDisplay){
+      this.timeoutList.push(setTimeout(this.checkAnswer, this.blink));
+    }
+    this.setWindowSize();
+  },
 });
 
 module.exports = Game;
