@@ -34,6 +34,14 @@ function clone(obj) {
 	return newObj;
 }
 
+function setAttrByObj(target, info, force){
+  for(var key in info){
+    if(target.hasOwnProperty(key) || force){
+      target[key] = info[key];
+    }
+  }
+}
+
 function makeUrl(path) {
   var url = base + '/' + path;
   return url.replace(/\/+/g, '/');
@@ -236,8 +244,20 @@ function genNBackSeq(trials, ratio, nback){
   return [ret, hitArr];
 }
 
+function expand(arr, length){
+  if (arr.length == 0) return [];
+  var repeatsPerElement = Math.floor(length / arr.length);
+  var remainders = length - repeatsPerElement * arr.length;
+  var ret = [];
+  for (let i=0; i<repeatsPerElement; i++){
+    ret = ret.concat(arr);
+  }
+  ret = ret.concat(arr.slice(0, remainders));
+  return ret;
+}
+
 module.exports = {
-	random, counter, clone, arrRepeat, genSeq, makeUrl,
+	random, counter, clone, arrRepeat, genSeq, makeUrl, setAttrByObj,
   // for app1
   toHex, genPallet, randomColorPos,
   // for app2
@@ -247,5 +267,6 @@ module.exports = {
   // for app4
   genStopSeq,
   // for N back
-  genNBackSeq
+  genNBackSeq,
+  expand
 };

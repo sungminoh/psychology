@@ -3,25 +3,8 @@ import { Form, FormGroup, ControlLabel, FormControl, Button, Row, Grid, Col} fro
 
 
 var ResponseButton = React.createClass({
-  getInitialState(){
-    return(
-      disabled0: false,
-      disabled1: false
-    );
-  },
   onClickHandler(e){
     this.props.callback(e.target.value);
-    if(e.target.id == '0'){
-      this.setState({
-        disabled0: true,
-        disabled1: false
-      });
-    }else if(e.target.id == '1'){
-      this.setState({
-        disabled0: false,
-        disabled1: true
-      });
-    }
   },
   render(){
     var buttonStyle = {
@@ -35,7 +18,7 @@ var ResponseButton = React.createClass({
           id='0'
           style={buttonStyle}
           value={this.props.value[0]}
-          disabled={this.state.disabled0}
+          disabled={this.props.selected == this.props.value[0]}
           onClick={this.onClickHandler}
           onTouchStart={this.onClickHandler}
         >
@@ -45,7 +28,7 @@ var ResponseButton = React.createClass({
           id='1'
           style={buttonStyle}
           value={this.props.value[1]}
-          disabled={this.state.disabled1}
+          disabled={this.props.selected == this.props.value[1]}
           onClick={this.onClickHandler}
           onTouchStart={this.onClickHandler}
         >

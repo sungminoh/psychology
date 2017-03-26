@@ -7,7 +7,7 @@ import Fixation from './Fixation'
 import Target from './Target'
 import ResponseButton from './ResponseButton';
 import distinctColors from 'distinct-colors';
-import { clone, random, makeUrl, genNBackSeq } from '../helpers';
+import { clone, random, makeUrl, genNBackSeq, setAttrByObj } from '../helpers';
 import { Button, Grid, Row, Col } from 'react-bootstrap';
 
 
@@ -24,6 +24,7 @@ var Game = React.createClass({
       countdown: false,
       numberDisplay: false,
       beforeN: true,
+      selectedReaction: '',
       // for game panel size
       responseHeight: 0,
       gridHeight: 0,
@@ -31,6 +32,34 @@ var Game = React.createClass({
       maxSize: 0,
     };
   },
+  isNotStarted() {
+    return !this.state.game && !this.state.practice;
+  },
+  isAllDone() {
+    return this.state.gameDone;
+  },
+  isGame() {
+    return this.state.game && !this.state.practice;
+  },
+  isPractice() {
+    return !this.state.game && this.state.practice;
+  },
+  isTrialsDone() {
+    return this.state.gameTrialsDone || this.state.practiceTrialsDone;
+  },
+  isCountdown() {
+    return this.state.countdown;
+  },
+  isPracticeDone() {
+    return this.state.practiceDone;
+  },
+  isPracticeTrialsDone() {
+    return (this.state.practice && this.state.practiceTrialsDone) || this.state.practiceDone;
+  },
+  isBeforeN() {
+    return this.state.beforeN;
+  },
+
   componentWillMount(){ // component attributes
     // from inputbox
     this.id = '';
@@ -38,26 +67,50 @@ var Game = React.createClass({
     this.numberOfTrialsPerGame = 0;
     this.numberOfPractices = 0;
     this.numberOfTrialsPerPractice = 0;
+    this.hitRatio = 0;
     this.expose = 0;
     this.blink = 0;
     // game information
     this.gameNbackTypes = [];
+    this.gameNbackIdx = 0;
     this.currentGameNback = 0;
     this.gameIdx = 0;
     this.gameNumberSeq = [];
     this.gameHitSeq = [];
     // practice information
     this.practiceNbackTypes = [];
+    this.practiceNbackIdx = 0;
     this.currentPracticeNback = 0;
     this.practiceIdx = 0;
     this.practiceNumberSeq = [];
     this.practiceHitSeq = [];
     // user answers
-    this.selectedReaction = '';
+    this.currentUserReactions = [];
+    this.currentUserAnswers = [];
+    // for result
+    this.gameNumberSeqs = [];
+    this.gameHitSeqs = [];
     this.userReactions = [];
-    this.userAnwers = [];
+    this.userAnswers = [];
     // to handle timeouts
     this.timeoutList = [];
+  },
+  getData(){
+    var obj = {}
+    // from inputbox
+    obj.id = this.id;
+    obj.numberOfGames = this.numberOfGames;
+    obj.numberOfTrialsPerGame = this.numberOfTrialsPerGame;
+    obj.hitRatio = this.hitRatio;
+    obj.expose = this.expose;
+    obj.blink = this.blink;
+    // game information
+    obj.gameNbackTypes = this.gameNbackTypes;
+    obj.gameNumberSeq = this.gameNumberSeq;
+    obj.gameHitSeq = this.gameHitSeq;
+    // user answers
+    obj.userReactions = this.userReactions;
+    obj.userAnswers = this.userAnswers;
   },
   resetComponent(){
     this.setState(this.getInitialState());
@@ -70,20 +123,10 @@ var Game = React.createClass({
     var historyButton = ( <Button onClick={this.redirectToHistory} > 기록 보기 </Button>);
     return ( <InputForm onClick={this.onClickStart} additionalButtons={historyButton} />);
   },
-  setAttrByObj(obj){
-    for(var key in obj){
-      if(key in this){
-        this[key] = obj[key];
-      }
-    }
-  },
   onClickStart(props){ // triggered by inputform
-    var nbacks = Array.from(props.nbacks).sort();
-    this.gameNbackTypes = nbacks.slice();
-    this.practiceNbackTypes = nbacks.slice();
-    this.setAttrByObj(props)
+    setAttrByObj(this, props)
     this.setState({
-      // game status (game, practice are mutualy exclusive)
+      // game status (game, practice are mutually exclusive)
       game: props.numberOfPractices == '0' ? true : false,
       gameDone: false,
       gameTrialsDone: false,
@@ -99,45 +142,60 @@ var Game = React.createClass({
     return <CountdownTimer sec={s} onExpired={this.startTrials} />;
   },
   startTrials(){
-    if(this.state.game){
-      this.currentGameNback = this.gameNbackTypes.shift();
+    this.currentUserAnswers = [];
+    this.currentUserReaction = [];
+    if(this.isGame()){
+      //this.currentGameNback = this.gameNbackTypes.shift();
+      this.currentGameNback = this.gameNbackTypes[this.gameNbackIdx ++];
       [this.gameNumberSeq, this.gameHitSeq] = genNBackSeq(this.numberOfTrialsPerGame, this.hitRatio, this.currentGameNback);
-    }else if(this.state.practice){
-      this.currentPracticeNback= this.practiceNbackTypes.shift();
-      [this.practiceNumberSeq, this.practiceHitSeq] = genNBackSeq(this.numberOfTrialsPerPractice, this.numberOfPractices, this.currentPracticeNback);
+      this.gameIdx = 0;
+    }else if(this.isPractice()){
+      //this.currentPracticeNback= this.practiceNbackTypes.shift();
+      this.currentPracticeNback= this.practiceNbackTypes[this.practiceNbackIdx ++];
+      [this.practiceNumberSeq, this.practiceHitSeq] = genNBackSeq(this.numberOfTrialsPerPractice, this.hitRatio, this.currentPracticeNback);
+      this.practiceIdx = 0;
     }
-    this.setState({
+    this.setNextState({
+      practiceTrialsDone: false,
+      gameTrialsDone: false,
       numberDisplay: true,
-      countdown: false,
+      countdown:  false
     });
   },
   render(){
     // before start game, get inputs
-    if(!this.state.game && !this.state.practice){
+    if(this.isNotStarted()){
       return this.getInputForm();
     }
     // after end of game, show results
-    if(this.state.gameDone){
+    if(this.isAllDone()){
       return this.getResult();
     }
     // countdown
-    if(this.state.countdown){
+    if(this.isCountdown()){
       return <div> {this.getCountdownTimer(0)} </div>;
     }
     // game or practice
     return(
       <div>
         {this.state.numberDisplay ? this.getNumber() : null}
+        {this.isPracticeTrialsDone() ? this.getFeedback() : null}
         {this.getButton()}
       </div>
     );
   },
   getNumber(){
+    var numberStyle = {
+      fontSize: this.state.maxSize/5,
+      marginTop: this.state.gridHeight*0.3,
+      textAlign: 'center',
+      display: 'block'
+    }
     var number;
-    if(this.state.practice){
-      number = <div>{this.practiceNumberSeq[this.practiceIdx]}</div>
-    }else if(this.state.game){
-      number = <div>{this.gameNumberSeq[this.gameIdx]}</div>
+    if(this.isPractice()){
+      number = <div style={numberStyle}>{this.practiceNumberSeq[this.practiceIdx]}</div>
+    }else if(this.isGame()){
+      number = <div style={numberStyle}>{this.gameNumberSeq[this.gameIdx]}</div>
     }
     return number;
   },
@@ -159,17 +217,17 @@ var Game = React.createClass({
       fontSize: this.state.responseHeight/2
     }
     // done with all practices
-    if(this.state.practiceDone){
+    if(this.isPracticeDone()){
       var buttonStyleRed = clone(buttonStyle);
-      buttonStyleRed['color'] = 'red';
+      buttonStyleRed.color = 'red';
       return (
         <div style={divStyle}>
-          <Button style={buttonStyleRed} onClick={this.startGame} > 게임 시작 </Button>
+          <Button style={buttonStyleRed} onClick={this.startTrials} > 게임 시작 </Button>
         </div>
       );
     }
     // end of trials set
-    if(this.state.practiceTrials || this.state.gameTrials){
+    else if(this.isTrialsDone()){
       var button;
       if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
         button = <Button style={buttonStyle} onTouchStart={this.startTrials} > 다음 게임 </Button>;
@@ -179,76 +237,98 @@ var Game = React.createClass({
       return <div style={divStyle}> {button} </div>;
     }
     // before N (this current trial is an introduction)
-    if(this.state.beforeN){
+    else if(this.isBeforeN()){
       return (
         <div style={divStyle}>
           <Button style={buttonStyle} value='next' onClick={this.nextNumber}> 다음 </Button>
         </div>
       );
     }
-    // doing trials
-    return (
-      <div style={divStyle}>
-        <ResponseButton
-          text={['일치', '불일치']}
-          value={['same', 'different']}
-          specs={{height: this.state.responseHeight}}
-          callback={x => this.selectedReaction = x}/>
-      </div>
-    );
-  },
-  startGame(){
-    this.setState({
-      game: true,
-      practice: false,
-      practiceDone: false,
-    })
-    this.startTrials();
+    else if(this.state.numberDisplay){
+      return (
+        <div style={divStyle}>
+          <ResponseButton
+            text={['일치', '불일치']}
+            value={['same', 'different']}
+            specs={{height: this.state.responseHeight}}
+            selected={this.state.selectedReaction}
+            callback={x => {this.setState({selectedReaction: x})}}/>
+        </div>
+      );
+    }
+    else{
+      return (
+        <div style={divStyle}>
+          <Button style={buttonStyle} value='next' disabled={true}></Button>
+        </div>
+      );
+    }
   },
   nextNumber(){
-    for(var timeout in this.timeoutList){
-      clearTimeout(timeout);
+    // remove all the timeout event
+    for(var i in this.timeoutList){
+      clearTimeout(this.timeoutList[i]);
+      delete this.timeoutList[i]
     }
-    this.checkAnswer();
+    this.timeoutList = [];
+    if(this.isBeforeN()){
+      // just move index and check whether it is still before N or not
+      if(this.isPractice()) this.practiceIdx ++;
+      if(this.isGame()) this.gameIdx ++;
+      this.setNextState({numberDisplay: false});
+    }
+    else{
+      this.checkAnswer()
+    }
   },
-  checkAnswer(e){
+  checkAnswer(){
+      var correctness = false;
+      if(this.isPractice()){
+        correctness = (this.practiceHitSeq[this.practiceIdx] && (this.state.selectedReaction == 'same'))
+          || (!this.practiceHitSeq[this.practiceIdx] && (this.state.selectedReaction == 'different'));
+        this.practiceIdx ++;
+      }
+      if(this.isGame()){
+        correctness = (this.gameHitSeq[this.gameIdx] && (this.state.selectedReaction == 'same'))
+          || (!this.gameHitSeq[this.gameIdx] && (this.state.selectedReaction == 'different'));
+        this.gameIdx ++;
+      }
+      this.currentUserReaction.push(this.state.selectedReaction);
+      this.currentUserAnswers.push(correctness);
+      this.setNextState({numberDisplay: false, selectedReaction: 'none'});
   },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  redirectToHome(){
-    this.props.router.push({ pathname: makeUrl('/') });
+  setNextState(additionalInfo){
+    var state = {};
+    if(this.state.practice){
+      state.beforeN = this.practiceIdx < this.currentPracticeNback;
+      state.practiceTrialsDone = this.practiceIdx == this.practiceNumberSeq.length;
+      state.practiceDone = state.practiceTrialsDone && this.practiceNbackIdx == this.practiceNbackTypes.length;
+      state.game = state.practiceDone;
+      state.practice = !state.practiceDone;
+    }else if(this.state.game){
+      state.beforeN = this.gameIdx < this.currentGameNback;
+      state.gameTrialsDone = this.gameIdx == this.gameNumberSeq.length;
+      if(state.gameTrialsDone){
+        this.gameNumberSeqs.push(this.gameNumberSeq);
+        this.gameHitSeqs.push(this.gameHitSeq);
+        this.userReactions.push(this.currentUserReaction);
+        this.userAnswers.push(this.currentUserAnswers);
+      }
+      state.gameDone = state.gameTrialsDone && this.gameNbackIdx == this.gameNbackTypes.length;
+      state.practiceTrialsDone = false;
+      state.practiceDone = false;
+      state.practice = false;
+    }
+    // during trials
+    if (!(state.practiceTrialsDone || state.gameTrialsDone)){
+      this.timeoutList.push(setTimeout(x => {this.setState({numberDisplay: true})}, this.blink));
+    }
+    setAttrByObj(state, additionalInfo, true);
+    this.setState(state);
   },
-  getResult(){
-    return (
-      <Result
-        testId={this.state.id}
-        seq={this.gameSeq}
-        userAnswers={this.userAnswers}
-        corrects={this.corrects}
-        reset={this.resetComponent}
-        home={this.redirectToHome}
-        expose={this.state.expose}
-        blink={this.state.blink}
-        wait={this.state.wait}
-      />
-    );
-  },
-
   getFeedback(){
+    var numberOfCorrects = this.currentUserAnswers.reduce((cnt, answer) => {return answer ? cnt+1 : cnt;}, 0);
+    var score = numberOfCorrects + "/" + this.numberOfTrialsPerPractice;
     return (<span
       style={{
         fontSize: this.state.maxSize/5,
@@ -256,40 +336,30 @@ var Game = React.createClass({
           textAlign: 'center',
           display: 'block'
       }} >
-      {this.state.OX}
+      {score}
     </span>
     );
   },
-  nextGame(e){
-    if(this.gameNbacks.length == 0){
-      // if all the games are over
-      this.endGame();
-    }else{
-      var beforeStart = (this.state.practice && this.currentPracticeNback > this.practiceIdx) || (!this.state.practice && this.currentGameNback > this.gameIdx);
-      if(this.state.practiceDone){
-        this.setState({
-          beforeNext: false,
-          numberDisplay: true,
-          practice: false,
-          practiceDone: false,
-          OX: ''
-        });
-      }else{
-        this.setState({
-          beforeNext: false,
-          numberDisplay: true,
-          OX: ''
-        });
-      }
-    }
+  redirectToHome(){
+    this.props.router.push({ pathname: makeUrl('/') });
   },
-  endGame(){
-    this.setState({
-      game: false,
-      numberDisplay: false,
-      beforeNext: false,
-      done: true
-    });
+  getResult(){
+    return (
+      <Result
+        testId={this.state.id}
+        numberOfGames={this.numberOfGames}
+        gameNbackTypes={this.gameNbackTypes}
+        gameNumberSeqs={this.gameNumberSeqs}
+        gameHitSeqs={this.gameHitSeqs}
+        userReactions={this.userReactions}
+        userAnswers={this.userAnswers}
+        hitRatio={this.hitRatio}
+        expose={this.expose}
+        blink={this.blink}
+        reset={this.resetComponent}
+        home={this.redirectToHome}
+      />
+    );
   },
   setWindowSize(){
     var windowHeight = window.innerHeight;
@@ -306,11 +376,13 @@ var Game = React.createClass({
     }
   },
   componentDidUpdate(prevProps, prevState){
+    // when number appears, it should be disappear after a few seconds expose
     if(!prevState.numberDisplay && this.state.numberDisplay){
       this.timeoutList.push(setTimeout(x => {this.setState({numberDisplay: false});}, this.expose));
     }
+    // when number dispears, it should check answer and call next number after short blink
     if(prevState.numberDisplay && !this.state.numberDisplay){
-      this.timeoutList.push(setTimeout(this.checkAnswer, this.blink));
+      this.timeoutList.push(setTimeout(this.nextNumber(), this.blink));
     }
     this.setWindowSize();
   },

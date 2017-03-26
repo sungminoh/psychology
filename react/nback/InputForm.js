@@ -2,6 +2,7 @@ import React from 'react';
 import Checkbox from 'rc-checkbox';
 import { Form, FormGroup, ControlLabel, FormControl, Button, Row, Grid, Col} from 'react-bootstrap';
 import 'rc-checkbox/assets/index.css';
+import { clone, expand } from '../helpers.js'
 
 var NbackCheckboxGroup = React.createClass({
   render(){
@@ -23,29 +24,35 @@ var InputForm = React.createClass({
   PropTypes: {
     onClick: React.PropTypes.func.isRequired
   },
+  // test
+  //componentDidMount(){
+    //var nbacks = Array.from(this.state.nbacks);
+    //var state = clone(this.state);
+    //state.gameNbackTypes = expand(nbacks, state.numberOfGames).sort()
+    //state.practiceNbackTypes = expand(nbacks, state.numberOfPractices).sort()
+    //this.props.onClick(state);
+  //},
 
   getInitialState() {
     return {
       id: '',
       isValidId: false,
-      numberOfGames:12,
+      numberOfGames: 3, // 12
       isValidNumberOfGames: true,
-      numberOfTrialsPerGame: 12,
+      numberOfTrialsPerGame: 3, //12
       isValidNumberOfTrialsPerGame: true,
-      numberOfPractices: 3,
+      numberOfPractices: 3, // 3
       isValidNumberOfPractices: true,
-      numberOfTrialsPerPractice: 12,
+      numberOfTrialsPerPractice: 3, // 12
       isValidNumberOfTrialsPerPractice: true,
       nbacks: new Set([1,2,3]),
       nbacksSize: 3,
       hitRatio: 25,
       isValidHitRatio: true,
-      expose: 800,
+      expose: 10, // 800
       isValidExpose: true,
-      blink: 200,
+      blink: 10, // 200
       isValidBlink: true,
-      //interval: 1000,
-      //isValidInterval: true,
     };
   },
 
@@ -122,14 +129,12 @@ var InputForm = React.createClass({
     this.setState({ blink: e.target.value });
   },
 
-  //changeInterval(e) {
-    //const parsedValue = parseInt(e.target.value);
-    //this.setState({isValidInterval: !isNaN(parsedValue) && parsedValue >= 0});
-    //this.setState({ interval: e.target.value });
-  //},
-
   startGame(){
-    this.props.onClick(this.state);
+    var nbacks = Array.from(this.state.nbacks);
+    var state = clone(this.state);
+    state.gameNbackTypes = expand(nbacks, state.numberOfGames).sort()
+    state.practiceNbackTypes = expand(nbacks, state.numberOfPractices).sort()
+    this.props.onClick(state);
   },
 
   render() {
@@ -213,7 +218,6 @@ var InputForm = React.createClass({
             || !this.state.isValidHitRatio
             || !this.state.isValidExpose
             || !this.state.isValidBlink
-            //|| !this.state.isValidInterval
           }
         >
           시작
@@ -253,20 +257,6 @@ var InputForm = React.createClass({
         </FormGroup>
       </Form>
     );
-      /*
-    ({' '}
-      <FormGroup validationState={this.getValidationState('isValidInterval')} >
-        <ControlLabel>간격 시간:</ControlLabel>
-        {' '}
-        <FormControl
-          type='number'
-          placeholder={this.state.interval}
-          onChange={this.changeInterval}
-        />
-        <FormControl.Feedback/>
-      </FormGroup>)
-      */
-
   }
 });
 

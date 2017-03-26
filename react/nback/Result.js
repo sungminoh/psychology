@@ -7,24 +7,12 @@ var TableRow = React.createClass({
     return (
       <tr>
         <td>{this.props.idx}</td>
-        <td>{this.props.location}</td>
-        <td>{this.props.stop}</td>
-        <td>{this.props.userAnswer}</td>
-        <td>{this.props.correct}</td>
-        <td>{this.props.delay}</td>
+        <td>{this.props.nbackType}</td>
+        <td>{this.props.score}</td>
       </tr>
     );
   }
 });
-
-
-function makeString(obj){
-  var str = [];
-  for(var key in obj){
-    str.push(key+':'+obj[key]);
-  }
-  return str.join(' / ');
-}
 
 var Result = React.createClass({
   getInitialState(){
@@ -32,61 +20,57 @@ var Result = React.createClass({
       saved: false
     };
   },
-
   propTypes: {
-    seq: React.PropTypes.array,
-    stopSeq: React.PropTypes.array,
-    delays: React.PropTypes.array,
+    testId: React.PropTypes.string,
+    numberOfGames: React.PropTypes.number,
+    gameNbackTypes: React.PropTypes.array,
+    gameNumberSeqs: React.PropTypes.array,
+    gameHitSeqs: React.PropTypes.array,
+    userReactions: React.PropTypes.array,
     userAnswers: React.PropTypes.array,
-    corrects: React.PropTypes.array,
-    fixation: React.PropTypes.number,
+    expose: React.PropTypes.number,
     blink: React.PropTypes.number,
-    wait: React.PropTypes.number,
     reset: React.PropTypes.func,
     home: React.PropTypes.func
   },
   getAvergeTr(){
-    var cntOfLocations = counter(this.props.seq);
-    var cntOfStops = counter(this.props.stopSeq);
-    var cntOfAnswers = counter(this.props.userAnswers);
-    var numberOfCorrects = counter(this.props.corrects)['정답'];
-    if(!numberOfCorrects){
-      numberOfCorrects = 0;
+    var numberOfCorrects = 0;
+    var numberOfReactions = 0;
+    for(var i=0;i<this.props.numberOfGames; i++){
+      var nbackType = this.props.gameNbackTypes[i];
+      var answers = this.props.userAnswers[i]
+      numberOfCorrects += answers.reduce((cnt, answer) => {return answer ? cnt+1 : cnt}, 0);
+      numberOfReactions += answers.length
     }
-    var avgOfCorrects =  numberOfCorrects / this.props.corrects.length;
-    var validDelays = this.props.delays.filter((x) => x != '');
-    var avgOfDelays = validDelays.reduce((a, b) => a+b)/validDelays.length;
+    var correctRatio = (numberOfCorrects / numberOfReactions).toFixed(2)
+    var score = numberOfCorrects + "/" + numberOfReactions + " (" + correctRatio + ")";
     return (
       <TableRow
         idx='avg.'
-        location={makeString(cntOfLocations)}
-        stop={makeString(cntOfStops)}
-        userAnswer={makeString(cntOfAnswers)}
-        correct={avgOfCorrects.toFixed(2)}
-        delay={avgOfDelays.toFixed(2)}
+        nbackType=''
+        score={score}
       />
     )
   },
-
   getList(){
     var ret = [];
-    for (var i=0; i<this.props.corrects.length; i++){
+    for (var i=0; i<this.props.numberOfGames; i++){
+      var nbackType = this.props.gameNbackTypes[i];
+      var answers = this.props.userAnswers[i]
+      var numberOfCorrects = answers.reduce((cnt, answer) => {return answer ? cnt+1 : cnt}, 0);
+      var correctRatio = (numberOfCorrects / answers.length).toFixed(2)
+      var score = numberOfCorrects + "/" + answers.length + " (" + correctRatio + ")";
       ret.push(
         <TableRow
           key={i+1}
           idx={i+1}
-          location={this.props.seq[i]}
-          stop={this.props.stopSeq[i]}
-          delays={this.props.delays[i]}
-          userAnswer={this.props.userAnswers[i]}
-          correct={this.props.corrects[i]}
-          delay={this.props.delays[i]}
+          nbackType={nbackType}
+          score={score}
         />
       )
     }
     return ret;
   },
-
   render() {
     return (
       //<div className="static-modal">
@@ -99,11 +83,8 @@ var Result = React.createClass({
             <thead>
               <tr>
                 <th>#</th>
-                <th>위치</th>
-                <th>정지신호(ms)</th>
-                <th>응답</th>
-                <th>정오</th>
-                <th>응답 시간</th>
+                <th>N back</th>
+                <th>정답률</th>
               </tr>
             </thead>
             <tbody>
@@ -121,7 +102,6 @@ var Result = React.createClass({
         //</div>
     );
   },
-
   sendResult(){
     var requestHeader = {
       method: 'POST',
@@ -131,7 +111,7 @@ var Result = React.createClass({
       },
       body: JSON.stringify(this.props)
     }
-    fetch(makeUrl('/app4/result'), requestHeader)
+    fetch(makeUrl('/nback/result'), requestHeader)
       .then((response) => {
         if (response.ok){
           alert('성공적으로 저장되었습니다.');
