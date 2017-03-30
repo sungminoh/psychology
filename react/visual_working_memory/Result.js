@@ -131,22 +131,17 @@ var Result = React.createClass({
     var requestHeader = {
       method: 'POST',
       headers: {
-        //'Accept': 'application/json, application/xml, text/play, text/html, *.*',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(obj)
     }
-    fetch(makeUrl('/app1/result'), requestHeader)
+    fetch(makeUrl('/result/visual_working_memory'), requestHeader)
       .then((response) => {
         if (response.ok){
           alert('성공적으로 저장되었습니다.');
           this.setState({saved: true});
         }
       })
-    //.then((response) => response.json())
-    //.then((responseJson) => {
-    //console.log(responseJson);
-    //})
       .catch((error) => {
         alert('데이터가 정상적으로 저장되지 못하였습니다. 다시 시도하세요.');
       });

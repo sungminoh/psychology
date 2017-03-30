@@ -1,3 +1,6 @@
+var path = require('path'),
+    webpack = require('webpack');
+
 module.exports = {
     entry: './react/index.js',
 
@@ -16,22 +19,30 @@ module.exports = {
       ]
     },
 
+    plugins: [
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NoErrorsPlugin()
+    ],
+
     module: {
-            loaders: [
-                {
-                    test: /\.js$/,
-                    loader: 'babel',
-                    exclude: /node_modules/,
-                    query: {
-                        cacheDirectory: true,
-                        presets: ['es2015', 'react']
-                    }
-                },
-              {test: /\.css/, loader: 'style-loader!css-loader'},
-              {
-        test: /\.less$/,
-        loader: "style-loader!css-loader!less-loader"
-      }
-            ]
-        }
+        loaders: [
+            {
+                test: /\.jsx?$/,
+                loader: 'babel',
+                exclude: /node_modules/,
+                query: {
+                    cacheDirectory: true,
+                    presets: ['es2015', 'react']
+                }
+            },
+            {
+                test: /\.css/,
+                loader: 'style-loader!css-loader'
+            },
+            {
+                test: /\.less$/,
+                loader: "style-loader!css-loader!less-loader"
+            }
+        ]
+    }
 };

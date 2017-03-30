@@ -54,7 +54,7 @@ var History = React.createClass({
     }
   },
   getResultHistory(){
-    fetch(makeUrl('/app1/result'), { method: 'GET', accept: 'application/json'})
+    fetch(makeUrl('/result/visual_working_memory'), { method: 'GET', accept: 'application/json'})
       .then((response) => response.json())
       .then((responseJson) => {
         this.data = responseJson.result;
@@ -65,11 +65,11 @@ var History = React.createClass({
       });
   },
   redirectToGame(e){
-    this.props.router.push({ pathname: makeUrl('/app1/game') });
+    this.props.router.push({ pathname: makeUrl('/visual-working-memory/game') });
   },
   requestRemoveAll(e){
     var password = prompt('비밀번호를 입력하세요.');
-    fetch(makeUrl('/app1/result'), { method: 'DELETE', accept: 'application/json', body: JSON.stringify({'password': password})})
+    fetch(makeUrl('/result/visual_working_memory'), { method: 'DELETE', accept: 'application/json', body: JSON.stringify({'password': password})})
       .then((response) => {
         if(response.status == 200){
           this.setState({fetched: false});
