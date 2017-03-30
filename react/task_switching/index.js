@@ -20,19 +20,16 @@ function Index(props){
 
 var Selector = React.createClass({
   handleClick(e){
-    if(e.target.id == 1){
-      this.props.router.push({ pathname: makeUrl('/app3/game') });
-    }else{
-      this.props.router.push({ pathname: makeUrl('/app3/history') });
-    }
+    var value = e.target.value;
+    this.props.router.push({ pathname: makeUrl('/task-switching/' + value) });
   },
   render(){
     return (
       <div className="well" style={wellStyles}>
-        <Button id={1} bsStyle="info" bsSize="large" onClick={this.handleClick} block>
+        <Button value='game' bsStyle="info" bsSize="large" onClick={this.handleClick} block>
           게임 시작
         </Button>
-        <Button id={2} bsStyle="info" bsSize="large" onClick={this.handleClick} block>
+        <Button value='history' bsStyle="info" bsSize="large" onClick={this.handleClick} block>
           결과 보기
         </Button>
       </div>
@@ -42,7 +39,7 @@ var Selector = React.createClass({
 
 
 module.exports = {
-  path: 'app3',
+  path: 'task-switching',
   component: Index,
   indexRoute: {component: Selector},
   childRoutes: [

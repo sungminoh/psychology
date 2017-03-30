@@ -20,17 +20,17 @@ function Index(props){
 
 var Selector = React.createClass({
   handleClick(e){
-    var id = e.target.id
-    this.props.router.push({ pathname: makeUrl('/visual-working-memory/' + id) });
+    var value = e.target.value
+    this.props.router.push({ pathname: makeUrl('/visual-working-memory/' + value) });
   },
 
   render(){
     return (
       <div className="well" style={wellStyles}>
-        <Button id='game' bsStyle="info" bsSize="large" onClick={this.handleClick} block>
+        <Button value='game' bsStyle="info" bsSize="large" onClick={this.handleClick} block>
           게임 시작
         </Button>
-        <Button id='history' bsStyle="info" bsSize="large" onClick={this.handleClick} block>
+        <Button value='history' bsStyle="info" bsSize="large" onClick={this.handleClick} block>
           결과 보기
         </Button>
       </div>

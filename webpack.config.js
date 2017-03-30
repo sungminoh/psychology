@@ -13,8 +13,8 @@ module.exports = {
         inline: true,
         port: 7777,
       contentBase: [
-        __dirname + '/templates/',
-        //__dirname + '/static/',
+        //__dirname + '/templates/',
+        __dirname + '/static/',
         __dirname + '/react/'
       ]
     },
