@@ -21,16 +21,16 @@ function Index(props){
 var Selector = React.createClass({
   handleClick(e){
     var value = e.target.value
-    this.props.router.push({ pathname: makeUrl('/visual-working-memory/' + value) });
+    this.props.router.push({ pathname: makeUrl('/' + value + '/visual_working_memory') });
   },
 
   render(){
     return (
       <div className="well" style={wellStyles}>
-        <Button value='game' bsStyle="info" bsSize="large" onClick={this.handleClick} block>
+        <Button value="game" bsStyle="info" bsSize="large" onClick={this.handleClick} block>
           게임 시작
         </Button>
-        <Button value='history' bsStyle="info" bsSize="large" onClick={this.handleClick} block>
+        <Button value="history" bsStyle="info" bsSize="large" onClick={this.handleClick} block>
           결과 보기
         </Button>
       </div>
@@ -38,19 +38,4 @@ var Selector = React.createClass({
   }
 });
 
-
-module.exports = {
-  path: 'visual-working-memory',
-  component: Index,
-  indexRoute: {component: Selector},
-  childRoutes: [
-    {
-      path: 'game',
-      component: Game
-    },
-    {
-      path: 'history',
-      component: History
-    }
-  ]
-}
+module.exports = Selector

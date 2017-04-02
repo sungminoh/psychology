@@ -54,7 +54,7 @@ var History = React.createClass({
     }
   },
   getResultHistory(){
-    fetch(makeUrl('/app3/result'), { method: 'GET', accept: 'application/json'})
+    fetch(makeUrl('/result/task_switching'), { method: 'GET', accept: 'application/json'})
       .then((response) => response.json())
       .then((responseJson) => {
         this.data = responseJson.result;
@@ -65,11 +65,11 @@ var History = React.createClass({
       });
   },
   redirectToGame(e){
-    this.props.router.push({ pathname: makeUrl('/app3/game') });
+    this.props.router.push({ pathname: makeUrl('/game/task_switching') });
   },
   requestRemoveAll(e){
     var password = prompt('비밀번호를 입력하세요.');
-    fetch(makeUrl('/app3/result'), { method: 'DELETE', accept: 'application/json', body: JSON.stringify({'password': password})})
+    fetch(makeUrl('/result/task_switching'), { method: 'DELETE', accept: 'application/json', body: JSON.stringify({'password': password})})
       .then((response) => {
         if(response.status == 200){
           this.setState({fetched: false});
@@ -87,7 +87,7 @@ var History = React.createClass({
       <div>
         <Button onClick={this.redirectToGame}> 게임 하기 </Button>
         {' '}
-        <Form inline style={{margin:"0", display:"inline"}} method='GET' action={makeUrl('/app3/download')}>
+        <Form inline style={{margin:"0", display:"inline"}} method='GET' action={makeUrl('/download/task_switching')}>
           <Button type='submit' > 저장 하기 </Button>
         </Form>
         {' '}

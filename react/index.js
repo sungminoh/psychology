@@ -10,6 +10,18 @@ import TaskSwitching from './task_switching';
 import StopSignalTask from './stop_signal_task';
 import Nback from './nback';
 
+import VisualWorkingMemoryGame from './visual_working_memory/Game';
+import MentalRotationGame from './mental_rotation/Game';
+import TaskSwitchingGame from './task_switching/Game';
+import StopSignalTaskGame from './stop_signal_task/Game';
+import NbackGame from './nback/Game';
+
+import VisualWorkingMemoryHistory from './visual_working_memory/History';
+import MentalRotationHistory from './mental_rotation/History';
+import TaskSwitchingHistory from './task_switching/History';
+import StopSignalTaskHistory from './stop_signal_task/History';
+import NbackHistory from './nback/History';
+
 import { makeUrl } from './helpers';
 import { base } from './config';
 
@@ -21,8 +33,8 @@ function Index(props){
 
 var Selector = React.createClass({
   handleClick(e){
-    var id = e.target.id;
-    this.props.router.push({ pathname: makeUrl('/' + id) });
+    var value = e.target.value;
+    this.props.router.push({ pathname: makeUrl('/' + value) });
   },
 
   render(){
@@ -33,44 +45,46 @@ var Selector = React.createClass({
     };
     return (
       <div className="well" style={wellStyles}>
-        <Button id='visual-working-memory' bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
+        <Button value='visual_working_memory' bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
           Visual Working Memory
         </Button>
-        <Button id='mental-rotation' bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
+        <Button value='mental_rotation' bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
           Mental Rotation
         </Button>
-        <Button id='task-switching' bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
+        <Button value='task_switching' bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
           Task Switching
         </Button>
-        <Button id='stop-signal-task' bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
+        <Button value='stop_signal_task' bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
           Stop Sginal Task
         </Button>
-        <Button id='nback' bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
-          N-back
+        <Button value='nback' bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
+          N back
         </Button>
       </div>
     )
   }
 });
 
-
-const routes = {
-  path: base,
-  component: Index,
-  indexRoute: {component: Selector},
-  childRoutes: [
-    VisualWorkingMemory,
-    MentalRotation,
-    TaskSwitching,
-    StopSignalTask,
-    Nback
-  ]
-}
-
-
 const rootElement = document.getElementById('root');
-ReactDOM.render(
-  <Router
-    history={browserHistory}
-    routes={routes}
-  />, rootElement)
+ReactDOM.render((
+  <Router history={browserHistory}>
+    <Route path={base} component={Index}>
+      <IndexRoute component={Selector}/>
+      <Route path='/visual_working_memory' component={VisualWorkingMemory}/>
+      <Route path='/mental_rotation' component={MentalRotation}/>
+      <Route path='/task_switching' component={TaskSwitching}/>
+      <Route path='/stop_signal_task' component={StopSignalTask}/>
+      <Route path='/nback' component={Nback}/>
+      <Route path='/game/visual_working_memory' component={VisualWorkingMemoryGame}/>
+      <Route path='/game/mental_rotation' component={MentalRotationGame}/>
+      <Route path='/game/task_switching' component={TaskSwitchingGame}/>
+      <Route path='/game/stop_signal_task' component={StopSignalTaskGame}/>
+      <Route path='/game/nback' component={NbackGame}/>
+      <Route path='/history/visual_working_memory' component={VisualWorkingMemoryHistory}/>
+      <Route path='/history/mental_rotation' component={MentalRotationHistory}/>
+      <Route path='/history/task_switching' component={TaskSwitchingHistory}/>
+      <Route path='/history/stop_signal_task' component={StopSignalTaskHistory}/>
+      <Route path='/history/nback' component={NbackHistory}/>
+    </Route>
+  </Router>
+), rootElement);

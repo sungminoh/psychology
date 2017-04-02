@@ -117,7 +117,7 @@ var Game = React.createClass({
     this.componentWillMount();
   },
   redirectToHistory(e){
-    this.props.router.push({ pathname: makeUrl('/nback/history') });
+    this.props.router.push({ pathname: makeUrl('/history/nback') });
   },
   getInputForm(){
     var historyButton = ( <Button onClick={this.redirectToHistory} > 기록 보기 </Button>);

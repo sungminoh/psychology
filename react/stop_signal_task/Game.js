@@ -93,7 +93,7 @@ var Game = React.createClass({
   },
 
   redirectToHistory(e){
-    this.props.router.push({ pathname: makeUrl('/app4/history') });
+    this.props.router.push({ pathname: makeUrl('/history/stop_signal_task') });
   },
   redirectToHome(){
     this.props.router.push({ pathname: makeUrl('/') });

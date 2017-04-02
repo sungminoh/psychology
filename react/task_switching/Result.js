@@ -163,7 +163,7 @@ var Result = React.createClass({
       },
       body: JSON.stringify(obj)
     }
-    fetch(makeUrl('/app3/result'), requestHeader)
+    fetch(makeUrl('/result/task_switching'), requestHeader)
       .then((response) => {
         if (response.ok){
           alert('성공적으로 저장되었습니다.');

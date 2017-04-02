@@ -125,3 +125,5 @@ chrome-user-data
 db_info.py
 *.ini
 react/config.js
+
+data/db.sqlite3*

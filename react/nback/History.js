@@ -54,7 +54,7 @@ var History = React.createClass({
     }
   },
   getResultHistory(){
-    fetch(makeUrl('/app4/result'), { method: 'GET', accept: 'application/json'})
+    fetch(makeUrl('/result/nback'), { method: 'GET', accept: 'application/json'})
       .then((response) => response.json())
       .then((responseJson) => {
         this.data = responseJson.result;
@@ -65,10 +65,10 @@ var History = React.createClass({
       });
   },
   redirectToGame(e){
-    this.props.router.push({ pathname: makeUrl('/app4/game') });
+    this.props.router.push({ pathname: makeUrl('/game/nback') });
   },
   requestRemoveAll(e){
-    fetch(makeUrl('/app4/result'), { method: 'DELETE', accept: 'application/json'})
+    fetch(makeUrl('/result/nback'), { method: 'DELETE', accept: 'application/json'})
       .then((response) => response.ok)
       .then((responseOk) => {
         if(responseOk){
@@ -85,7 +85,7 @@ var History = React.createClass({
       <div>
         <Button onClick={this.redirectToGame}> 게임 하기 </Button>
         {' '}
-        <Form inline style={{margin:"0", display:"inline"}} method='GET' action={makeUrl('/app4/download')}>
+        <Form inline style={{margin:"0", display:"inline"}} method='GET' action={makeUrl('/download/nback')}>
           <Button type='submit' > 저장 하기 </Button>
         </Form>
         {' '}

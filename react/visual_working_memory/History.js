@@ -65,7 +65,7 @@ var History = React.createClass({
       });
   },
   redirectToGame(e){
-    this.props.router.push({ pathname: makeUrl('/visual-working-memory/game') });
+    this.props.router.push({ pathname: makeUrl('/game/visual_working_memory') });
   },
   requestRemoveAll(e){
     var password = prompt('비밀번호를 입력하세요.');
@@ -87,7 +87,7 @@ var History = React.createClass({
       <div>
         <Button onClick={this.redirectToGame}> 게임 하기 </Button>
         {' '}
-        <Form inline style={{margin:"0", display:"inline"}} method='GET' action={makeUrl('/app1/download')}>
+        <Form inline style={{margin:"0", display:"inline"}} method='GET' action={makeUrl('/download/visual_working_memory')}>
           <Button type='submit' > 저장 하기 </Button>
         </Form>
         {' '}

@@ -71,7 +71,7 @@ var Game = React.createClass({
   },
 
   redirectToHistory(e){
-    this.props.router.push({ pathname: makeUrl('/app2/history') });
+    this.props.router.push({ pathname: makeUrl('/history/mental_rotation') });
   },
   redirectToHome(){
     this.props.router.push({ pathname: makeUrl('/') });
@@ -150,7 +150,7 @@ var Game = React.createClass({
       }else{
         var image = null;
         if(this.state.targetDisplay){
-          var path = '../static/app2/';
+          var path = '../static/mental_rotation/';
           if(this.state.practice){
             path += this.practiceSeq[this.practiceIdx].join('-') + '.png';
           }else{

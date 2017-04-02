@@ -106,12 +106,11 @@ var Result = React.createClass({
     var requestHeader = {
       method: 'POST',
       headers: {
-        //'Accept': 'application/json, application/xml, text/play, text/html, *.*',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(this.props)
     }
-    fetch(makeUrl('/nback/result'), requestHeader)
+    fetch(makeUrl('/result/nback'), requestHeader)
       .then((response) => {
         if (response.ok){
           alert('성공적으로 저장되었습니다.');

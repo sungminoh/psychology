@@ -126,22 +126,17 @@ var Result = React.createClass({
     var requestHeader = {
       method: 'POST',
       headers: {
-        //'Accept': 'application/json, application/xml, text/play, text/html, *.*',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(this.props)
     }
-    fetch(makeUrl('/app4/result'), requestHeader)
+    fetch(makeUrl('/result/stop_signal_task'), requestHeader)
       .then((response) => {
         if (response.ok){
           alert('성공적으로 저장되었습니다.');
           this.setState({saved: true});
         }
       })
-    //.then((response) => response.json())
-    //.then((responseJson) => {
-    //console.log(responseJson);
-    //})
       .catch((error) => {
         alert('데이터가 정상적으로 저장되지 못하였습니다. 다시 시도하세요.');
       });
