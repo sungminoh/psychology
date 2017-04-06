@@ -127,3 +127,4 @@ db_info.py
 react/config.js
 
 data/db.sqlite3*
+*.sqlite3

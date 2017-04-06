@@ -23,6 +23,7 @@ var Result = React.createClass({
   propTypes: {
     testId: React.PropTypes.string,
     numberOfGames: React.PropTypes.number,
+    numberOfTrialsPerGame: React.PropTypes.number,
     gameNbackTypes: React.PropTypes.array,
     gameNumberSeqs: React.PropTypes.array,
     gameHitSeqs: React.PropTypes.array,
@@ -37,10 +38,10 @@ var Result = React.createClass({
     var numberOfCorrects = 0;
     var numberOfReactions = 0;
     for(var i=0;i<this.props.numberOfGames; i++){
-      var nbackType = this.props.gameNbackTypes[i];
-      var answers = this.props.userAnswers[i]
-      numberOfCorrects += answers.reduce((cnt, answer) => {return answer ? cnt+1 : cnt}, 0);
-      numberOfReactions += answers.length
+      var nbackType = parseInt(this.props.gameNbackTypes[i]);
+      var answers = this.props.userAnswers[i];
+      numberOfCorrects += answers.reduce((cnt, answer) => {return answer === true ? cnt+1 : cnt}, 0);
+      numberOfReactions += (answers.length - nbackType);
     }
     var correctRatio = (numberOfCorrects / numberOfReactions).toFixed(2)
     var score = numberOfCorrects + "/" + numberOfReactions + " (" + correctRatio + ")";
@@ -55,11 +56,12 @@ var Result = React.createClass({
   getList(){
     var ret = [];
     for (var i=0; i<this.props.numberOfGames; i++){
-      var nbackType = this.props.gameNbackTypes[i];
-      var answers = this.props.userAnswers[i]
-      var numberOfCorrects = answers.reduce((cnt, answer) => {return answer ? cnt+1 : cnt}, 0);
-      var correctRatio = (numberOfCorrects / answers.length).toFixed(2)
-      var score = numberOfCorrects + "/" + answers.length + " (" + correctRatio + ")";
+      var nbackType = parseInt(this.props.gameNbackTypes[i]);
+      var answers = this.props.userAnswers[i];
+      var numberOfCorrects = answers.reduce((cnt, answer) => {return answer === true ? cnt+1 : cnt}, 0);
+      var numberOfReactions = (answers.length - nbackType);
+      var correctRatio = (numberOfCorrects / numberOfReactions).toFixed(2)
+      var score = numberOfCorrects + "/" + numberOfReactions + " (" + correctRatio + ")";
       ret.push(
         <TableRow
           key={i+1}

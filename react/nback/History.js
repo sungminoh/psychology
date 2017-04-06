@@ -11,12 +11,13 @@ var TableRow = React.createClass({
       <tr>
         <td>{this.props.idx}</td>
         <td>{this.props.seq}</td>
-        <td>{this.props.stopSeq}</td>
+        <td>{this.props.nback}</td>
+        <td>{this.props.number}</td>
+        <td>{this.props.hit}</td>
         <td>{this.props.userInput}</td>
         <td>{this.props.correct}</td>
-        <td>{this.props.fixation}</td>
+        <td>{this.props.expose}</td>
         <td>{this.props.blink}</td>
-        <td>{this.props.wait}</td>
         <td>{dateText}</td>
       </tr>
     )
@@ -24,7 +25,7 @@ var TableRow = React.createClass({
 });
 
 
-function  getList(data){
+function getList(data){
   var ret = [];
   for (var i=0; i<data.length; i++){
     var row = data[i]
@@ -33,13 +34,14 @@ function  getList(data){
         key={i+1}
         idx={row[0]}
         seq={row[1]}
-        stopSeq={row[2]}
-        userInput={row[3]}
-        correct={row[4]}
-        fixation={row[5]}
-        blink={row[6]}
-        wait={row[7]}
-        ts={row[8]}
+        nback={row[2]}
+        number={row[3]}
+        hit={row[4]}
+        userInput={row[5]}
+        correct={row[6]}
+        expose={row[7]}
+        blink={row[8]}
+        ts={row[9]}
       />
     )
   }
@@ -95,13 +97,14 @@ var History = React.createClass({
           <thead>
             <tr>
               <th>실험 번호</th>
-              <th>위치</th>
-              <th>정지신호(ms)</th>
+              <th>게임 번호</th>
+              <th>N back</th>
+              <th>자극</th>
+              <th>일치 여부</th>
               <th>응답</th>
               <th>정답</th>
-              <th>픽세이션(ms)</th>
+              <th>노출 시간(ms)</th>
               <th>공백 시간(ms)</th>
-              <th>응답 대기 시간(ms)</th>
               <th>실험 시각</th>
             </tr>
           </thead>

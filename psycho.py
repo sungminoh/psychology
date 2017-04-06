@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, render_template, request, Response, g, jsonify
-from ast import literal_eval as parseJson
+from json import loads as parse_json
+# from ast import literal_eval as parse_json
 # import MySQLdb as mdb
 # from db_info import mysql_conf, password
 import sqlite3
-# from pdb import set_trace as bp
+from pdb import set_trace as bp
 import time
 from data.database_manager import DatabaseManager
 from utils.download_manager import DownloadManager
+password = 'psycho'
 
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
-
 
 @app.before_request
 def before_request():
@@ -21,7 +22,8 @@ def before_request():
 
 @app.teardown_request
 def teardown_request(exception):
-    g.db.close()
+    del(g.db)
+    del(g.down)
 
 
 @app.route('/')
@@ -33,10 +35,14 @@ def teardown_request(exception):
 @app.route('/game/mental_rotation')
 @app.route('/game/task_switching')
 @app.route('/game/stop_signal_task')
+@app.route('/game/nback')
+@app.route('/game/spatial_memory')
 @app.route('/history/visual_working_memory')
 @app.route('/history/mental_rotation')
 @app.route('/history/task_switching')
 @app.route('/history/stop_signal_task')
+@app.route('/history/nback')
+@app.route('/history/spatial_memory')
 def index():
     return render_template('index.html')
 
@@ -44,7 +50,7 @@ def index():
 class PostRequestHandler(object):
     @staticmethod
     def visual_working_memory(request):
-        request_data = parseJson(request.data)
+        request_data = parse_json(request.data)
         test_id = request_data['testId']
         game_box_seq = request_data['gameBoxSeq']
         game_answers = request_data['gameAnswers']
@@ -57,28 +63,28 @@ class PostRequestHandler(object):
                 game_box_seq[i], game_answers[i], user_answers[i], corrects[i],
                 expose, blink, interval)
                 for i in range(len(game_box_seq))]
-        g.db.insert(table, data)
+        g.db.insert('visual_working_memory', data)
 
     @staticmethod
     def mental_rotation(request):
-        request_data = parseJson(request.data)
+        request_data = parse_json(request.data)
         test_id = request_data['testId']
         game_seq = request_data['gameSeq']
         user_answers = request_data['userAnswers']
         delays = request_data['delays']
         data = [(test_id,
-                 'ㅋ' if game_seq[i][1] == 'char' else '5',
+                 u'ㅋ' if game_seq[i][1] == 'char' else '5',
                  game_seq[i][2], game_seq[i][0],
                  user_answers[i],
                  1 if user_answers[i] == game_seq[i][0] else 0,
                  delays[i]
                  )
                 for i in range(len(game_seq))]
-        g.db.insert(table, data)
+        g.db.insert('mental_rotation', data)
 
     @staticmethod
     def task_switching(request):
-        request_data = parseJson(request.data)
+        request_data = parse_json(request.data)
         test_id = request_data['testId']
         switch_seq = request_data['gameSwitchSeq']
         seq = request_data['gameSeq']
@@ -89,18 +95,18 @@ class PostRequestHandler(object):
         # test_id = get_test_id('task_switching')
         data = [(test_id,
                  seq[i][1], seq[i][0],
-                 '양' if types[i] == 0 else '수',
+                 u'양' if types[i] == 0 else u'수',
                  'maintain' if switch_seq[i] == 0 else
                  'compatible' if switch_seq[i] == 1 else 'incompitible',
                  answers[i], corrects[i],
                  delays[i]
                  )
                 for i in range(len(seq))]
-        g.db.insert(table, data)
+        g.db.insert('task_switching', data)
 
     @staticmethod
     def stop_signal_task(request):
-        request_data = parseJson(request.data)
+        request_data = parse_json(request.data)
         test_id = request_data['testId']
         seq = request_data['seq']
         stop_seq = request_data['stopSeq']
@@ -114,19 +120,36 @@ class PostRequestHandler(object):
                  seq[i], stop_seq[i], user_answers[i], corrects[i], delays[i],
                  fixation, blink, wait)
                 for i in range(len(seq))]
+        g.db.insert('stop_signal_task', data)
 
     @staticmethod
     def nback(request):
-        request_data = parseJson(request.data)
+        request_data = parse_json(request.data)
         test_id = request_data['testId']
-
+        number_of_games = int(request_data['numberOfGames'])
+        game_seq = [i for i in range(1, number_of_games+1)]
+        nback_type = request_data['gameNbackTypes']
+        number = request_data['gameNumberSeqs']
+        hit = request_data['gameHitSeqs']
+        user_input = request_data['userReactions']
+        correct = request_data['userAnswers']
+        expose = request_data['expose']
+        blink = request_data['blink']
+        data = []
+        for i in range(number_of_games):
+            data.extend([(test_id,
+                          game_seq[i], j+1, nback_type[i],
+                          number[i][j], hit[i][j], user_input[i][j], correct[i][j],
+                          expose, blink)
+                         for j in range(len(number))])
+        g.db.insert('nback', data)
 
 @app.route('/download/<table>', methods=['GET'])
 def download(table):
-    data = g.db.download(table)
+    data = g.db.select(table)
     filename = g.down.get_filename(table)
     csv_text = g.down.get_csv(table, data)
-    return Response(csvText,
+    return Response(csv_text,
                     mimetype='text/csv',
                     headers={
                         'Content-disposition':
@@ -135,14 +158,14 @@ def download(table):
 
 
 @app.route('/result/<table>', methods=['POST', 'GET', 'DELETE'])
-def result():
+def result(table):
     if request.method == 'POST':
         getattr(PostRequestHandler, table)(request)
         return jsonify(result='success')
     elif request.method == 'GET':
         return jsonify(result=g.db.select(table))
     elif request.method == 'DELETE':
-        request_data = parseJson(request.data)
+        request_data = parse_json(request.data)
         if request_data['password'] == password:
             g.db.delete(table)
             return Response(status=200)

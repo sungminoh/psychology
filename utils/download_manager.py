@@ -10,8 +10,11 @@ headers = {
     'task_switching': ['test_id', 'value', 'quantity', 'game_type', 'compatibility',
                        'user_input', 'correct', 'delay', 'timestamp'],
     'stop_signal_task': ['test_id',
-                         'location', 'stop_signal', 'user_input', 'is_correct', 'delay',
-                         'fixation', 'blink', 'wait', 'timestamp']
+                         'location', 'stop_signal', 'user_input', 'correct', 'delay',
+                         'fixation', 'blink', 'wait', 'timestamp'],
+    'nback': ['test_id',
+              'game_seq', 'number_seq', 'nback_type', 'number', 'hit', 'user_input', 'correct',
+              'expose', 'blink', 'timestamp']
 }
 
 

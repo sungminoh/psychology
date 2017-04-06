@@ -66,6 +66,8 @@ create_tables = ["""
                  CREATE TABLE nback(
                  id              INTEGER PRIMARY KEY AUTOINCREMENT,
                  test_id         VARCHAR(255) NOT NULL,
+                 game_seq        INTEGER NOT NULL,
+                 number_seq      INTEGER NOT NULL,
                  nback_type      VARCHAR(8) NOT NULL,
                  number          INTEGER NOT NULL,
                  hit             TINYINT(1) NOT NULL,
@@ -80,69 +82,44 @@ create_tables = ["""
 
 insert = {
     'visual_working_memory': ('INSERT INTO visual_working_memory '
-                              '(test_id, boxes, is_changed, user_input, correct, '
-                              'expose, blink, inter) '
-                              'VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'),
+                              '(test_id, boxes, is_changed, user_input, correct, expose, blink, inter) '
+                              'VALUES (?, ?, ?, ?, ?, ?, ?, ?)'),
     'mental_rotation': ('INSERT INTO mental_rotation '
-                        '(test_id, letter, rotation, flip, '
-                        'user_input, correct, delay) '
-                        'VALUES (%s, %s, %s, %s, %s, %s, %s) '),
+                        '(test_id, letter, rotation, flip, user_input, correct, delay) '
+                        'VALUES (?, ?, ?, ?, ?, ?, ?) '),
     'task_switching': ('INSERT INTO task_switching '
-                       '(test_id, val, quant, game_type, '
-                       'compatibility, user_input, correct, delay) '
-                       'VALUES (%s, %s, %s, %s, %s, %s, %s, %s) '),
+                       '(test_id, val, quant, game_type, compatibility, user_input, correct, delay) '
+                       'VALUES (?, ?, ?, ?, ?, ?, ?, ?) '),
     'stop_signal_task': ('INSERT INTO stop_signal_task '
-                         '(test_id, location, stop, user_input, correct, delay, '
-                         'fixation, blink, wait) '
-                         'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)')
+                         '(test_id, location, stop, user_input, correct, delay, fixation, blink, wait) '
+                         'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'),
+    'nback': ('INSERT INTO nback '
+              '(test_id, game_seq, number_seq, nback_type, number, hit, user_input, correct, expose, blink) '
+              'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
 }
 
 select = {
     'visual_working_memory': ('SELECT '
-                              'test_id, boxes, is_changed, user_input, correct, '
-                              'expose, blink, inter, ts '
+                              'test_id, boxes, is_changed, user_input, correct, expose, blink, inter, ts '
                               'FROM visual_working_memory '),
     'mental_rotation': ('SELECT '
-                        'test_id, letter, rotation, flip, '
-                        'user_input, correct, delay, ts '
+                        'test_id, letter, rotation, flip, user_input, correct, delay, ts '
                         'FROM mental_rotation '),
     'task_switching': ('SELECT '
-                       'test_id, val, quant, game_type, '
-                       'compatibility, user_input, correct, delay, ts '
+                       'test_id, val, quant, game_type, compatibility, user_input, correct, delay, ts '
                        'FROM task_switching '),
     'stop_signal_task': ('SELECT '
-                         'test_id, location, stop, user_input, correct, delay, '
-                         'fixation, blink, wait, ts '
-                         'FROM stop_signal_task ')
-
-
-
+                         'test_id, location, stop, user_input, correct, delay, fixation, blink, wait, ts '
+                         'FROM stop_signal_task '),
+    'nback': ('SELECT '
+              'test_id, game_seq, number_seq, nback_type, number, hit, user_input, correct, expose, blink, ts '
+              'FROM nback ')
 }
 
 delete = {
     'visual_working_memory': ('DELETE FROM visual_working_memory'),
     'mental_rotation': ('DELETE FROM mental_rotation'),
     'task_switching': ('DELETE FROM task_switching'),
-    'stop_signal_task': ('DELETE FROM stop_signal_task')
+    'stop_signal_task': ('DELETE FROM stop_signal_task'),
+    'nback': ('DELETE FROM nback')
 }
-
-
-export = {
-    'visual_working_memory': ('SELECT '
-                              'test_id, boxes, is_changed, user_input, correct, '
-                              'expose, blink, inter, ts '
-                              'FROM visual_working_memory '),
-    'mental_rotation': ('SELECT '
-                        'test_id, letter, rotation, flip, '
-                        'user_input, correct, delay, ts '
-                        'FROM mental_rotation '),
-    'task_switching': ('SELECT '
-                       'test_id, val, quant, game_type, '
-                       'compatibility, user_input, correct, delay, ts '
-                       'FROM task_switching '),
-    'stop_signal_task': ('SELECT '
-                         'test_id, location, stop, user_input, correct, delay, '
-                         'fixation, blink, wait, ts '
-                         'FROM stop_signal_task ')
-}
-

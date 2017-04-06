@@ -37,21 +37,21 @@ var InputForm = React.createClass({
     return {
       id: '',
       isValidId: false,
-      numberOfGames: 3, // 12
+      numberOfGames: 12,
       isValidNumberOfGames: true,
-      numberOfTrialsPerGame: 3, //12
+      numberOfTrialsPerGame: 12,
       isValidNumberOfTrialsPerGame: true,
-      numberOfPractices: 3, // 3
+      numberOfPractices: 3,
       isValidNumberOfPractices: true,
-      numberOfTrialsPerPractice: 3, // 12
+      numberOfTrialsPerPractice: 12,
       isValidNumberOfTrialsPerPractice: true,
       nbacks: new Set([1,2,3]),
       nbacksSize: 3,
       hitRatio: 25,
       isValidHitRatio: true,
-      expose: 10, // 800
+      expose: 800,
       isValidExpose: true,
-      blink: 10, // 200
+      blink: 200,
       isValidBlink: true,
     };
   },
@@ -75,38 +75,38 @@ var InputForm = React.createClass({
   changeNumberOfGames(e) {
     const parsedValue = parseInt(e.target.value);
     this.setState({isValidNumberOfGames: !isNaN(parsedValue) && parsedValue > 0});
-    this.setState({ numberOfGames: e.target.value });
+    this.setState({ numberOfGames: parsedValue });
   },
 
   changeNumberOfTrialsPerGame(e) {
     const parsedValue = parseInt(e.target.value);
     this.setState({ isValidNumberOfTrialsPerGame: !isNaN(parsedValue) && parsedValue > 0});
-    this.setState({ numberOfTrialsPerGame: e.target.value });
+    this.setState({ numberOfTrialsPerGame: parsedValue });
   },
 
 
   changeNumberOfPractices(e) {
     const parsedValue = parseInt(e.target.value);
     this.setState({isValidNumberOfPractices: !isNaN(parsedValue) && parsedValue >= 0});
-    this.setState({ numberOfPractices: e.target.value });
+    this.setState({ numberOfPractices: parsedValue });
   },
 
   changeNumberOfTrialsPerPractice(e) {
     const parsedValue = parseInt(e.target.value);
     this.setState({isValidNumberOfTrialsPerPractice: !isNaN(parsedValue) && parsedValue >= 0});
-    this.setState({ numberOfTrialsPerPractice: e.target.value });
+    this.setState({ numberOfTrialsPerPractice: parsedValue });
   },
 
   changeHitRatio(e) {
     const parsedValue = parseInt(e.target.value);
     this.setState({isValidHitRatio: !isNaN(parsedValue) && parsedValue >= 0});
-    this.setState({ hitRatio: e.target.value });
+    this.setState({ hitRatio: parsedValue });
   },
 
   changeCheckbox(e){
     var name = e.target.className;
     var checked = e.target.checked;
-    var value = e.target.value;
+    var value = parseInt(e.target.value);
     if(checked){
       this.state[name].add(value);
     }else{
@@ -120,13 +120,13 @@ var InputForm = React.createClass({
   changeExpose(e) {
     const parsedValue = parseInt(e.target.value);
     this.setState({isValidExpose: !isNaN(parsedValue) && parsedValue >= 0});
-    this.setState({ expose: e.target.value });
+    this.setState({ expose: parsedValue });
   },
 
   changeBlink(e) {
     const parsedValue = parseInt(e.target.value);
     this.setState({isValidBlink: !isNaN(parsedValue) && parsedValue >= 0});
-    this.setState({ blink: e.target.value });
+    this.setState({ blink: parsedValue});
   },
 
   startGame(){

@@ -24,7 +24,7 @@ var Game = React.createClass({
       countdown: false,
       numberDisplay: false,
       beforeN: true,
-      selectedReaction: '',
+      selectedReaction: 'none',
       // for game panel size
       responseHeight: 0,
       gridHeight: 0,
@@ -143,7 +143,7 @@ var Game = React.createClass({
   },
   startTrials(){
     this.currentUserAnswers = [];
-    this.currentUserReaction = [];
+    this.currentUserReactions = [];
     if(this.isGame()){
       //this.currentGameNback = this.gameNbackTypes.shift();
       this.currentGameNback = this.gameNbackTypes[this.gameNbackIdx ++];
@@ -275,6 +275,8 @@ var Game = React.createClass({
       // just move index and check whether it is still before N or not
       if(this.isPractice()) this.practiceIdx ++;
       if(this.isGame()) this.gameIdx ++;
+      this.currentUserReactions.push('');
+      this.currentUserAnswers.push('');
       this.setNextState({numberDisplay: false});
     }
     else{
@@ -293,7 +295,7 @@ var Game = React.createClass({
           || (!this.gameHitSeq[this.gameIdx] && (this.state.selectedReaction == 'different'));
         this.gameIdx ++;
       }
-      this.currentUserReaction.push(this.state.selectedReaction);
+      this.currentUserReactions.push(this.state.selectedReaction);
       this.currentUserAnswers.push(correctness);
       this.setNextState({numberDisplay: false, selectedReaction: 'none'});
   },
@@ -311,7 +313,7 @@ var Game = React.createClass({
       if(state.gameTrialsDone){
         this.gameNumberSeqs.push(this.gameNumberSeq);
         this.gameHitSeqs.push(this.gameHitSeq);
-        this.userReactions.push(this.currentUserReaction);
+        this.userReactions.push(this.currentUserReactions);
         this.userAnswers.push(this.currentUserAnswers);
       }
       state.gameDone = state.gameTrialsDone && this.gameNbackIdx == this.gameNbackTypes.length;
@@ -327,7 +329,7 @@ var Game = React.createClass({
     this.setState(state);
   },
   getFeedback(){
-    var numberOfCorrects = this.currentUserAnswers.reduce((cnt, answer) => {return answer ? cnt+1 : cnt;}, 0);
+    var numberOfCorrects = this.currentUserAnswers.reduce((cnt, answer) => {return answer === true ? cnt+1 : cnt;}, 0);
     var score = numberOfCorrects + "/" + this.numberOfTrialsPerPractice;
     return (<span
       style={{
@@ -346,8 +348,9 @@ var Game = React.createClass({
   getResult(){
     return (
       <Result
-        testId={this.state.id}
+        testId={this.id}
         numberOfGames={this.numberOfGames}
+        numberOfTrialsPerGame={this.numberOfTrialsPerGame}
         gameNbackTypes={this.gameNbackTypes}
         gameNumberSeqs={this.gameNumberSeqs}
         gameHitSeqs={this.gameHitSeqs}

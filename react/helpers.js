@@ -228,7 +228,7 @@ function genNBackSeq(trials, ratio, nback){
   for(let i=0; i<Math.round(trials * ratio / 100); i++){
     hitArr[i] = true;
   }
-  hitArr = arrRepeat(null, nback).concat(d3.shuffle(hitArr));
+  hitArr = arrRepeat('', nback).concat(d3.shuffle(hitArr));
   var ret = new Array(hitArr.length);
   for(let i=0; i<nback; i++){
     ret[i] = random(0, 10);

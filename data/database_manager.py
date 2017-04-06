@@ -1,30 +1,35 @@
 import sqlite3
-from ..utils import helpers
+from utils import helpers
 import sql
+from pdb import set_trace as bp
 
 
 class DatabaseManager(object):
     def __init__(self, datafile):
-        self.conn = sqlite3.connect(datafile)
+        self.datafile = datafile
+        self.connect()
+
+    def connect(self):
+        self.conn = sqlite3.connect(self.datafile)
         self.cursor = self.conn.cursor()
-
-    def drop_tables(self):
-        for sql in sql.drop_tables:
-            self.cursor.execute(sql)
-        self.conn.commit()
-        return self
-
-    def create_tables(self):
-        for sql in sql.create_tables:
-            self.cursor.execute(sql)
-        self.conn.commit()
-        return self
 
     def close(self):
         self.conn.close()
 
     def commit(self):
         self.conn.commit()
+
+    def drop_tables(self):
+        for query in sql.drop_tables:
+            self.cursor.execute(query)
+        self.conn.commit()
+        return self
+
+    def create_tables(self):
+        for query in sql.create_tables:
+            self.cursor.execute(query)
+        self.conn.commit()
+        return self
 
     def get_test_id(self, table):
         self.cursor.execute('SELECT MAX(test_id) FROM %s' % table)
@@ -40,9 +45,10 @@ class DatabaseManager(object):
         self.commit()
         return self
 
-    def select(self, table, param=None):
+    def select(self, table):
         query = sql.select.get(table)
-        self.cursor.execute(query, param)
+        print query
+        self.cursor.execute(query)
         return helpers.convert_to_float_rec(self.cursor.fetchall())
 
     def delete(self, table):
@@ -50,11 +56,6 @@ class DatabaseManager(object):
         self.cursor.execute(query)
         self.commit()
         return self
-
-    def download(self, table):
-        query = sql.download.get(table)
-        self.cursor.execute(query)
-        return helpers.convert_to_float_rec(self.cursor.fetchall())
 
 
 def init_database():
