@@ -173,7 +173,7 @@ var Game = React.createClass({
     }
     // countdown
     if(this.isCountdown()){
-      return <div> {this.getCountdownTimer(0)} </div>;
+      return <div> {this.getCountdownTimer(3)} </div>;
     }
     // game or practice
     return(
