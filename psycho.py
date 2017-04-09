@@ -141,7 +141,7 @@ class PostRequestHandler(object):
                           game_seq[i], j+1, nback_type[i],
                           number[i][j], hit[i][j], user_input[i][j], correct[i][j],
                           expose, blink)
-                         for j in range(len(number))])
+                         for j in range(len(number[i]))])
         g.db.insert('nback', data)
 
 @app.route('/download/<table>', methods=['GET'])
@@ -171,7 +171,6 @@ def result(table):
             return Response(status=200)
         else:
             return Response(status=403)
-
 
 if __name__ == '__main__':
     app.run(debug=True)

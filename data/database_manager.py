@@ -1,7 +1,6 @@
 import sqlite3
 from utils import helpers
 import sql
-from pdb import set_trace as bp
 
 
 class DatabaseManager(object):

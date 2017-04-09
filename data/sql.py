@@ -95,7 +95,7 @@ insert = {
                          'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'),
     'nback': ('INSERT INTO nback '
               '(test_id, game_seq, number_seq, nback_type, number, hit, user_input, correct, expose, blink) '
-              'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+              'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
 }
 
 select = {

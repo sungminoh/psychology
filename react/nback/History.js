@@ -10,7 +10,8 @@ var TableRow = React.createClass({
     return (
       <tr>
         <td>{this.props.idx}</td>
-        <td>{this.props.seq}</td>
+        <td>{this.props.gameSeq}</td>
+        <td>{this.props.numberSeq}</td>
         <td>{this.props.nback}</td>
         <td>{this.props.number}</td>
         <td>{this.props.hit}</td>
@@ -33,15 +34,16 @@ function getList(data){
       <TableRow
         key={i+1}
         idx={row[0]}
-        seq={row[1]}
-        nback={row[2]}
-        number={row[3]}
-        hit={row[4]}
-        userInput={row[5]}
-        correct={row[6]}
-        expose={row[7]}
-        blink={row[8]}
-        ts={row[9]}
+        gameSeq={row[1]}
+        numberSeq={row[2]}
+        nback={row[3]}
+        number={row[4]}
+        hit={row[5]}
+        userInput={row[6]}
+        correct={row[7]}
+        expose={row[8]}
+        blink={row[9]}
+        ts={row[10]}
       />
     )
   }
@@ -70,7 +72,8 @@ var History = React.createClass({
     this.props.router.push({ pathname: makeUrl('/game/nback') });
   },
   requestRemoveAll(e){
-    fetch(makeUrl('/result/nback'), { method: 'DELETE', accept: 'application/json'})
+    var password = prompt('비밀번호를 입력하세요.');
+    fetch(makeUrl('/result/nback'), { method: 'DELETE', accept: 'application/json', body: JSON.stringify({'password': password})})
       .then((response) => response.ok)
       .then((responseOk) => {
         if(responseOk){
@@ -98,6 +101,7 @@ var History = React.createClass({
             <tr>
               <th>실험 번호</th>
               <th>게임 번호</th>
+              <th>숫자 순서</th>
               <th>N back</th>
               <th>자극</th>
               <th>일치 여부</th>
