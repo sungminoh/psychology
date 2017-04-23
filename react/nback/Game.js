@@ -3,8 +3,6 @@ import ReactDOM from 'react-dom';
 import CountdownTimer from '../CountdownTimer';
 import InputForm from './InputForm'
 import Result from './Result';
-import Fixation from './Fixation'
-import Target from './Target'
 import ResponseButton from './ResponseButton';
 import distinctColors from 'distinct-colors';
 import { clone, random, makeUrl, genNBackSeq, setAttrByObj } from '../helpers';

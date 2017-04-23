@@ -28,20 +28,27 @@ def teardown_request(exception):
 
 @app.route('/')
 @app.route('/visual_working_memory')
-@app.route('/mental_rotation')
-@app.route('/task_switching')
-@app.route('/stop_signal_task')
 @app.route('/game/visual_working_memory')
-@app.route('/game/mental_rotation')
-@app.route('/game/task_switching')
-@app.route('/game/stop_signal_task')
-@app.route('/game/nback')
-@app.route('/game/spatial_memory')
 @app.route('/history/visual_working_memory')
+
+@app.route('/mental_rotation')
+@app.route('/game/mental_rotation')
 @app.route('/history/mental_rotation')
+
+@app.route('/task_switching')
+@app.route('/game/task_switching')
 @app.route('/history/task_switching')
+
+@app.route('/stop_signal_task')
+@app.route('/game/stop_signal_task')
 @app.route('/history/stop_signal_task')
+
+@app.route('/nback')
+@app.route('/game/nback')
 @app.route('/history/nback')
+
+@app.route('/spatial_memory')
+@app.route('/game/spatial_memory')
 @app.route('/history/spatial_memory')
 def index():
     return render_template('index.html')
