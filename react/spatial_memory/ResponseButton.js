@@ -1,0 +1,42 @@
+import React from 'react';
+import { Form, FormGroup, ControlLabel, FormControl, Button, Row, Grid, Col} from 'react-bootstrap';
+
+
+var ResponseButton = React.createClass({
+  onClickHandler(e){
+    this.props.callback(e.target.value);
+  },
+  render(){
+    var buttonStyle = {
+      width: '50%',
+      height: '100%',
+      fontSize: this.props.specs.height / 2
+    };
+    return(
+      <div style={{width:'100%', height:'100%'}}>
+        <Button
+          id='0'
+          style={buttonStyle}
+          value={this.props.value[0]}
+          disabled={this.props.selected == this.props.value[0]}
+          onClick={this.onClickHandler}
+          onTouchStart={this.onClickHandler}
+        >
+          {this.props.text[0]}
+        </Button>
+        <Button
+          id='1'
+          style={buttonStyle}
+          value={this.props.value[1]}
+          disabled={this.props.selected == this.props.value[1]}
+          onClick={this.onClickHandler}
+          onTouchStart={this.onClickHandler}
+        >
+          {this.props.text[1]}
+        </Button>
+      </div>
+    );
+  }
+});
+
+module.exports = ResponseButton;

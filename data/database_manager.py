@@ -58,7 +58,7 @@ class DatabaseManager(object):
 
 
 def init_database():
-    DatabaseManager('./db.sqlite3').drop_tables().create_tables().close()
+    DatabaseManager('./data/db.sqlite3').drop_tables().create_tables().close()
 
 
 if __name__ == '__main__':

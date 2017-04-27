@@ -4,9 +4,7 @@ from json import loads as parse_json
 # from ast import literal_eval as parse_json
 # import MySQLdb as mdb
 # from db_info import mysql_conf, password
-import sqlite3
 from pdb import set_trace as bp
-import time
 from data.database_manager import DatabaseManager
 from utils.download_manager import DownloadManager
 password = 'psycho'
@@ -150,6 +148,24 @@ class PostRequestHandler(object):
                           expose, blink)
                          for j in range(len(number[i]))])
         g.db.insert('nback', data)
+
+    @staticmethod
+    def spatial_memory(request):
+        request_data = parse_json(request.data)
+        test_id = request_data['testId']
+        number_of_games = int(request_data['numberOfGames'])
+        game_seq = [i for i in range(1, number_of_games+1)]
+        positions = request_data['gameSeq']
+        user_trials = request_data['userTrials']
+        speed = request_data['speed']
+        data = []
+        for i in range(number_of_games):
+            data.extend([(test_id,
+                          game_seq[i], j+1, positions[i][j],
+                          user_trials[i][j], speed)
+                         for j in range(len(positions[i]))])
+        g.db.insert('spatial_memory', data)
+
 
 @app.route('/download/<table>', methods=['GET'])
 def download(table):

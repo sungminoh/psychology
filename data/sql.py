@@ -8,6 +8,8 @@ drop_tables =  ["""
                 DROP TABLE IF EXISTS stop_signal_task;
                 ""","""
                 DROP TABLE IF EXISTS nback;
+                ""","""
+                DROP TABLE IF EXISTS spatial_memory;
                 """]
 
 create_tables = ["""
@@ -77,7 +79,18 @@ create_tables = ["""
                  blink           INTEGER NOT NULL,
                  ts              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                  );
-                 """ ]
+                 ""","""
+                 CREATE TABLE spatial_memory(
+                 id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                 test_id         VARCHAR(255) NOT NULL,
+                 game_seq        INTEGER NOT NULL,
+                 target_seq      INTEGER NOT NULL,
+                 position        VARCHAR(16) NOT NULL,
+                 user_trials     INTEGER NOT NULL,
+                 speed           INTEGER NOT NULL,
+                 ts              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                 )
+                 """]
 
 
 insert = {
@@ -95,7 +108,10 @@ insert = {
                          'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'),
     'nback': ('INSERT INTO nback '
               '(test_id, game_seq, number_seq, nback_type, number, hit, user_input, correct, expose, blink) '
-              'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+              'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'),
+    'spatial_memory': ('INSERT INTO spatial_memory '
+                       '(test_id, game_seq, target_seq, position, user_trials, speed) '
+                       'VALUES (?, ?, ?, ?, ?, ?)')
 }
 
 select = {
@@ -113,7 +129,10 @@ select = {
                          'FROM stop_signal_task '),
     'nback': ('SELECT '
               'test_id, game_seq, number_seq, nback_type, number, hit, user_input, correct, expose, blink, ts '
-              'FROM nback ')
+              'FROM nback '),
+    'spatial_memory': ('SELECT '
+                       'test_id, game_seq, target_seq, position, user_trials, speed, ts '
+                       'FROM spatial_memory ')
 }
 
 delete = {
@@ -121,5 +140,6 @@ delete = {
     'mental_rotation': ('DELETE FROM mental_rotation'),
     'task_switching': ('DELETE FROM task_switching'),
     'stop_signal_task': ('DELETE FROM stop_signal_task'),
-    'nback': ('DELETE FROM nback')
+    'nback': ('DELETE FROM nback'),
+    'spatial_memory': ('DELETE FROM spatial_memory')
 }

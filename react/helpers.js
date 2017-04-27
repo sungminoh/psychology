@@ -256,17 +256,31 @@ function expand(arr, length){
   return ret;
 }
 
+function genAppearanceSeq(seqLength, gridSize){
+  var pool = new Set();
+  for(let i=0; i<gridSize; i++){
+    for(let j=0; j<gridSize; j++){
+      pool.add(i+','+j);
+    }
+  }
+  pool = d3.shuffle(Array.from(pool));
+  return pool.slice(0, seqLength);
+  //return pool.slice(0, seqLength).map((x) => (x.split(',').map(Number)));
+}
+
 module.exports = {
 	random, counter, clone, arrRepeat, genSeq, makeUrl, setAttrByObj,
-  // for app1
+  // for visual_working_memory
   toHex, genPallet, randomColorPos,
-  // for app2
+  // for mental_rotation
   genPossibles,
-  // for app3
+  // for task_switching
   genMaintains, genSwitchSeq, genNumbers,
-  // for app4
+  // for stop_signal_task
   genStopSeq,
-  // for N back
+  // for nback
   genNBackSeq,
-  expand
+  expand,
+  // for spatial_memory
+  genAppearanceSeq
 };
