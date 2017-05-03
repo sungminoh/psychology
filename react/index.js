@@ -76,24 +76,24 @@ ReactDOM.render((
   <Router history={browserHistory}>
     <Route path={base} component={Index}>
       <IndexRoute component={Selector}/>
-      <Route path='/visual_working_memory' component={VisualWorkingMemory}/>
-      <Route path='/mental_rotation' component={MentalRotation}/>
-      <Route path='/task_switching' component={TaskSwitching}/>
-      <Route path='/stop_signal_task' component={StopSignalTask}/>
-      <Route path='/nback' component={Nback}/>
-      <Route path='/spatial_memory' component={SpatialmMemory}/>
-      <Route path='/game/visual_working_memory' component={VisualWorkingMemoryGame}/>
-      <Route path='/game/mental_rotation' component={MentalRotationGame}/>
-      <Route path='/game/task_switching' component={TaskSwitchingGame}/>
-      <Route path='/game/stop_signal_task' component={StopSignalTaskGame}/>
-      <Route path='/game/nback' component={NbackGame}/>
-      <Route path='/game/spatial_memory' component={SpatialmMemoryGame}/>
-      <Route path='/history/visual_working_memory' component={VisualWorkingMemoryHistory}/>
-      <Route path='/history/mental_rotation' component={MentalRotationHistory}/>
-      <Route path='/history/task_switching' component={TaskSwitchingHistory}/>
-      <Route path='/history/stop_signal_task' component={StopSignalTaskHistory}/>
-      <Route path='/history/nback' component={NbackHistory}/>
-      <Route path='/history/spatial_memory' component={SpatialmMemoryHistory}/>
+      <Route path='visual_working_memory' component={VisualWorkingMemory}/>
+      <Route path='mental_rotation' component={MentalRotation}/>
+      <Route path='task_switching' component={TaskSwitching}/>
+      <Route path='stop_signal_task' component={StopSignalTask}/>
+      <Route path='nback' component={Nback}/>
+      <Route path='spatial_memory' component={SpatialmMemory}/>
+      <Route path='game/visual_working_memory' component={VisualWorkingMemoryGame}/>
+      <Route path='game/mental_rotation' component={MentalRotationGame}/>
+      <Route path='game/task_switching' component={TaskSwitchingGame}/>
+      <Route path='game/stop_signal_task' component={StopSignalTaskGame}/>
+      <Route path='game/nback' component={NbackGame}/>
+      <Route path='game/spatial_memory' component={SpatialmMemoryGame}/>
+      <Route path='history/visual_working_memory' component={VisualWorkingMemoryHistory}/>
+      <Route path='history/mental_rotation' component={MentalRotationHistory}/>
+      <Route path='history/task_switching' component={TaskSwitchingHistory}/>
+      <Route path='history/stop_signal_task' component={StopSignalTaskHistory}/>
+      <Route path='history/nback' component={NbackHistory}/>
+      <Route path='history/spatial_memory' component={SpatialmMemoryHistory}/>
     </Route>
   </Router>
 ), rootElement);

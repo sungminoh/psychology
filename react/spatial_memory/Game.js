@@ -63,7 +63,7 @@ var Game = React.createClass({
     return this.state.practiceDone;
   },
   isPracticeTrialsDone() {
-    return (this.state.practice && this.state.practiceTrialDone);
+    return (this.state.practice && this.state.practiceTrialDone) || this.state.practiceDone;
   },
   isBeforeN() {
     return this.state.beforeN;
@@ -75,7 +75,7 @@ var Game = React.createClass({
     this.numberOfGames = 0;
     this.numberOfPractices = 0;
     this.speed = 0;
-    this.gridSize = 6;
+    this.gridSize = 4;
     // game information
     this.gameIdx = 0;
     this.gameSeqLengths = [];
@@ -170,7 +170,13 @@ var Game = React.createClass({
     }
     // countdown
     if(this.isCountdown()){
-      return <div> {this.getCountdownTimer(0)} </div>;
+      //return <div> {this.getCountdownTimer(3)} </div>;
+      return (
+        <div>
+          <div>{this.getGuide()}</div>
+          <div>{this.getButton()}</div>
+        </div>
+      )
     }
     // game or practice
     // if it is exposing targets
@@ -271,7 +277,7 @@ var Game = React.createClass({
       fontSize: this.state.responseHeight/2
     }
     // done with all practices
-    if(this.isPracticeDone()){
+    if(this.isPracticeDone() || this.isCountdown()){
       var buttonStyleRed = clone(buttonStyle);
       buttonStyleRed.color = 'red';
       return (
@@ -324,6 +330,21 @@ var Game = React.createClass({
           display: 'block'
       }} >
       {score}
+    </span>
+    );
+  },
+  getGuide(){
+    let guide = ['검은 상자가 하나씩 나타났다가 사라집니다.', '등장하는 순서대로 정확히 눌러주세요'];
+    return (<span
+      style={{
+        fontSize: this.state.maxSize/20,
+        width: '100%',
+        top: this.state.maxSize*0.3,
+        textAlign: 'center',
+        display: 'block',
+        position: 'absolute'
+      }} >
+      {guide.map(s => (<div>{s}</div>))}
     </span>
     );
   },

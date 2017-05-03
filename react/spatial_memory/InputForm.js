@@ -43,6 +43,8 @@ var InputForm = React.createClass({
       isValidSeqLengths: true,
       speed: 1000,
       isValidSpeed: true,
+      gridSize: 4,
+      isValidGridSize: true
     };
   },
 
@@ -72,6 +74,12 @@ var InputForm = React.createClass({
     const parsedValue = parseInt(e.target.value);
     this.setState({isValidNumberOfPractices: !isNaN(parsedValue) && parsedValue >= 0});
     this.setState({ numberOfPractices: parsedValue });
+  },
+
+  changeGridSize(e) {
+    const parsedValue = parseInt(e.target.value);
+    this.setState({isValidGridSize: !isNaN(parsedValue) && parsedValue >= 0});
+    this.setState({ gridSize: parsedValue });
   },
 
   changeCheckbox(e){
@@ -146,6 +154,7 @@ var InputForm = React.createClass({
             || !this.state.isValidNumberOfPractices
             || !this.state.isValidSeqLengths
             || !this.state.isValidSpeed
+            || !this.state.isValidGridSize
           }
         >
           시작
@@ -172,6 +181,18 @@ var InputForm = React.createClass({
           />
           <FormControl.Feedback/>
         </FormGroup>
+        {' '}
+        <FormGroup validationState={this.getValidationState('isValidGridSize')} >
+          <ControlLabel>한변의 길이:</ControlLabel>
+          {' '}
+          <FormControl
+            type='number'
+            placeholder={this.state.gridSize}
+            onChange={this.changeGridSize}
+          />
+          <FormControl.Feedback/>
+        </FormGroup>
+
       </Form>
     );
   }

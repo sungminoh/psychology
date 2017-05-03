@@ -114,7 +114,7 @@ var Game = React.createClass({
   },
 
   getButton(){
-    if(this.state.practiceDone && !this.state.showGameType){
+    if((this.state.practiceDone && !this.state.showGameType) || this.state.countdown){
       return (
         <div
           style={{
@@ -160,8 +160,15 @@ var Game = React.createClass({
       }
     }else{
       if(this.state.countdown){
-        var countdownTimer = this.getCountdownTimer(3);
-        return ( <div> {countdownTimer} </div> );
+        //var countdownTimer = this.getCountdownTimer(3);
+        //return ( <div> {countdownTimer} </div> );
+        return (
+          <div>
+            {this.getGuide()}
+            {this.getButton()}
+          </div>
+
+        );
       }else{
         var text = [];
         var numberGrid = null;
@@ -191,7 +198,7 @@ var Game = React.createClass({
                 marginTop: this.state.maxSize/6
               }}
             >
-              {this.state.currentGameType == 0 ? '숫자 갯수' : '숫자 크기'}
+              {this.state.currentGameType == 0 ? '숫자 개수' : '숫자 크기'}
             </div>
           );
         }
@@ -204,6 +211,22 @@ var Game = React.createClass({
         );
       }
     }
+  },
+  getGuide(){
+    let guide = ['숫자 크기라고 쓰여 있을 떈', '등장하는 숫자가 5보다 큰지를 판별하고,',
+                '숫자 개수라고 쓰여 있을 땐', '등장하는 숫자의 갯수가 5보다 많은지를 판별하세요.'];
+    return (<span
+      style={{
+        fontSize: this.state.maxSize/20,
+        width: '100%',
+          top: this.state.gridHeight*0.4,
+          textAlign: 'center',
+          display: 'block',
+          position: 'absolute'
+      }} >
+      {guide.map(s => (<div>{s}</div>))}
+    </span>
+    );
   },
   checkAnswer(e){
     if(!this.state.targetDisplay){ return; }

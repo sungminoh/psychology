@@ -100,7 +100,7 @@ var Game = React.createClass({
   },
 
   getButton(){
-    if(this.state.practiceDone){
+    if(this.state.practiceDone || this.state.countdown){
       return (
         <div
           style={{
@@ -145,8 +145,15 @@ var Game = React.createClass({
       }
     }else{
       if(this.state.countdown){
-        var countdownTimer = this.getCountdownTimer(3);
-        return ( <div> {countdownTimer} </div> );
+        //var countdownTimer = this.getCountdownTimer(3);
+        //return ( <div> {countdownTimer} </div> );
+        return (
+          <div>
+            <div>{this.getGuide()}</div>
+            <div>{this.getButton()}</div>
+          </div>
+
+        );
       }else{
         var image = null;
         if(this.state.targetDisplay){
@@ -230,6 +237,9 @@ var Game = React.createClass({
     }
   },
   nextGame(){
+    if(this.state.countdown){
+      this.setState({countdown: false, targetDisplay: true})
+    }
     if(this.gameIdx == this.state.numberOfGames){
       this.endGame();
     }else{
@@ -247,6 +257,21 @@ var Game = React.createClass({
         });
       }
     }
+  },
+  getGuide(){
+    let guide = ['5또는 ㅋ이 등장합니다.', '거울상인지 아닌지 판별하세요'];
+    return (<span
+      style={{
+        fontSize: this.state.maxSize/20,
+        width: '100%',
+          top: this.state.gridHeight*0.4,
+          textAlign: 'center',
+          display: 'block',
+          position: 'absolute'
+      }} >
+      {guide.map(s => (<div>{s}</div>))}
+    </span>
+    );
   },
   endGame(){
     this.setState({

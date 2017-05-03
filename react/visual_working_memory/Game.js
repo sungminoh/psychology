@@ -125,7 +125,21 @@ var Game = React.createClass({
       return null;
     }
   },
-
+  getGuide(){
+    let guide = ['색깔 상자가 등장했다가 사라집니다', '색깔 상자가 다시 나타났을 때,', '색이 변했는지 판별하세요.'];
+    return (<span
+      style={{
+        fontSize: this.state.maxSize/20,
+        width: '100%',
+          top: this.state.gridHeight*0.4,
+          textAlign: 'center',
+          display: 'block',
+          position: 'absolute'
+      }} >
+      {guide.map(s => (<div>{s}</div>))}
+    </span>
+    );
+  },
   getColorGrid(pallet){
     if(this.state.targetDisplay){
       return (
@@ -168,7 +182,7 @@ var Game = React.createClass({
   },
 
   getButton(){
-    if(this.state.practiceDone){
+    if(this.state.practiceDone || this.state.countdown){
       return (
         <div
           style={{
@@ -213,8 +227,14 @@ var Game = React.createClass({
       }
     }else{
       if(this.state.countdown){
-        var countdownTimer = this.getCountdownTimer(3);
-        return ( <div> {countdownTimer} </div> );
+        //var countdownTimer = this.getCountdownTimer(3);
+        //return ( <div> {countdownTimer} </div> );
+        return (
+          <div>
+            {this.getGuide()}
+            {this.getButton()}
+          </div>
+        );
       }else{
         if(this.state.targetDisplay){
           var pallet, spare;
@@ -276,6 +296,9 @@ var Game = React.createClass({
     }
   },
   nextGame(){
+    if(this.state.countdown){
+      this.setState({ countdown: false, targetDisplay: true });
+    }
     if(this.gameIdx == this.state.numberOfGames){
       this.endGame();
     }else{

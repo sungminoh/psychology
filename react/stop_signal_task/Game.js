@@ -75,7 +75,7 @@ var Game = React.createClass({
     this.practiceStopSeq= genStopSeq(props.numberOfPractices, props.stopRatio, props.stopDelay);
     this.setState({
       game: true,
-      //countdown: true,
+      countdown: true,
       fixationDisplay: true,
       fixationHide: false,
       targetDisplay: false,
@@ -121,11 +121,24 @@ var Game = React.createClass({
       />
     );
   },
-
   getCountdownTimer(s){
     return <CountdownTimer sec={s} onExpired={x => {this.setState({ countdown: false, fixationDisplay: true});}} />;
   },
-
+  getGuide(){
+    let guide = ['동그라미가 나타난 방향을 최대한 빨리 선택하세요.', '하지만 빨간 동그라미가 나타나면 아무것도 선택하면 안됩니다.'];
+    return (<span
+      style={{
+        fontSize: this.state.maxSize/20,
+        width: '100%',
+          top: this.state.gridHeight*0.4,
+          textAlign: 'center',
+          display: 'block',
+          position: 'absolute'
+      }} >
+      {guide.map(s => (<div>{s}</div>))}
+    </span>
+    );
+  },
   getTarget(){
     var seq, idx, stopSeq;
     if (this.state.practice){
@@ -178,7 +191,7 @@ var Game = React.createClass({
     );
   },
   getButton(){
-    if(this.state.practiceDone){
+    if(this.state.practiceDone || this.state.countdown){
       return (
         <div
           style={{
@@ -273,8 +286,14 @@ var Game = React.createClass({
       }
     }else{
       if(this.state.countdown){
-        var countdownTimer = this.getCountdownTimer(3);
-        return ( <div> {countdownTimer} </div> );
+        //var countdownTimer = this.getCountdownTimer(3);
+        //return ( <div> {countdownTimer} </div> );
+        return (
+          <div>
+            {this.getGuide()}
+            {this.getButton()}
+          </div>
+        );
       }else{
         var main;
         if(this.state.fixationDisplay){
@@ -360,6 +379,9 @@ var Game = React.createClass({
     })
   },
   nextGame(e){
+    if(this.state.countdown){
+      this.setState({countdown: false, fixationDisplay: true});
+    }
     if(this.gameIdx == this.state.numberOfGames){
       this.endGame();
     }else{

@@ -140,25 +140,29 @@ var Game = React.createClass({
     return <CountdownTimer sec={s} onExpired={this.startTrials} />;
   },
   startTrials(){
-    this.currentUserAnswers = [];
-    this.currentUserReactions = [];
-    if(this.isGame()){
-      //this.currentGameNback = this.gameNbackTypes.shift();
-      this.currentGameNback = this.gameNbackTypes[this.gameNbackIdx ++];
-      [this.gameNumberSeq, this.gameHitSeq] = genNBackSeq(this.numberOfTrialsPerGame, this.hitRatio, this.currentGameNback);
-      this.gameIdx = 0;
-    }else if(this.isPractice()){
-      //this.currentPracticeNback= this.practiceNbackTypes.shift();
-      this.currentPracticeNback= this.practiceNbackTypes[this.practiceNbackIdx ++];
-      [this.practiceNumberSeq, this.practiceHitSeq] = genNBackSeq(this.numberOfTrialsPerPractice, this.hitRatio, this.currentPracticeNback);
-      this.practiceIdx = 0;
+    const afterTimeout = () => {
+      this.currentUserAnswers = [];
+      this.currentUserReactions = [];
+      if(this.isGame()){
+        //this.currentGameNback = this.gameNbackTypes.shift();
+        this.currentGameNback = this.gameNbackTypes[this.gameNbackIdx ++];
+        [this.gameNumberSeq, this.gameHitSeq] = genNBackSeq(this.numberOfTrialsPerGame, this.hitRatio, this.currentGameNback);
+        this.gameIdx = 0;
+      }else if(this.isPractice()){
+        //this.currentPracticeNback= this.practiceNbackTypes.shift();
+        this.currentPracticeNback= this.practiceNbackTypes[this.practiceNbackIdx ++];
+        [this.practiceNumberSeq, this.practiceHitSeq] = genNBackSeq(this.numberOfTrialsPerPractice, this.hitRatio, this.currentPracticeNback);
+        this.practiceIdx = 0;
+      }
+      this.setNextState({
+        practiceTrialsDone: false,
+        gameTrialsDone: false,
+        numberDisplay: true,
+        countdown:  false
+      });
     }
-    this.setNextState({
-      practiceTrialsDone: false,
-      gameTrialsDone: false,
-      numberDisplay: true,
-      countdown:  false
-    });
+    this.setState({practiceTrialsDone: false})
+    setTimeout(afterTimeout, 500);
   },
   render(){
     // before start game, get inputs
@@ -171,13 +175,20 @@ var Game = React.createClass({
     }
     // countdown
     if(this.isCountdown()){
-      return <div> {this.getCountdownTimer(3)} </div>;
+      return (
+        <div>
+          {/*<div> {this.getCountdownTimer(3)} </div>*/}
+          <div> {this.getGuide()} </div>
+          <div> {this.getButton()} </div>
+        </div>
+      );
     }
     // game or practice
     return(
       <div>
         {this.state.numberDisplay ? this.getNumber() : null}
         {this.isPracticeTrialsDone() ? this.getFeedback() : null}
+        {this.isTrialsDone() ? this.getGuide() : null}
         {this.getButton()}
       </div>
     );
@@ -215,7 +226,7 @@ var Game = React.createClass({
       fontSize: this.state.responseHeight/2
     }
     // done with all practices
-    if(this.isPracticeDone()){
+    if(this.isPracticeDone() || this.isCountdown()){
       var buttonStyleRed = clone(buttonStyle);
       buttonStyleRed.color = 'red';
       return (
@@ -332,11 +343,32 @@ var Game = React.createClass({
     return (<span
       style={{
         fontSize: this.state.maxSize/5,
-          marginTop: this.state.gridHeight*0.3,
+          marginTop: this.state.gridHeight*0.2,
           textAlign: 'center',
           display: 'block'
       }} >
       {score}
+    </span>
+    );
+  },
+  getGuide(){
+    let nextType;
+    if(this.isGame()){
+      nextType = this.gameNbackTypes[this.gameNbackIdx];
+    }else if(this.isPractice()){
+      nextType = this.practiceNbackTypes[this.practiceNbackIdx];
+    }
+    let guide = ['다음 게임은', `등장하는 숫자가 ${nextType}번 전의 숫자와 같을 때 일치를,`, '그렇지 않을 땐 불일치를 누르세요.'];
+    return (<span
+      style={{
+        fontSize: this.state.maxSize/20,
+        width: '100%',
+          top: this.state.gridHeight*0.5,
+          textAlign: 'center',
+          display: 'block',
+          position: 'absolute'
+      }} >
+      {guide.map(s => (<div>{s}</div>))}
     </span>
     );
   },
