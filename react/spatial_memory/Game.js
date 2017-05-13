@@ -7,7 +7,8 @@ import GridBoard from './GridBoard'
 import ResponseButton from './ResponseButton';
 import distinctColors from 'distinct-colors';
 import { clone, random, makeUrl, setAttrByObj, genAppearanceSeq } from '../helpers';
-import { Button, Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col } from 'react-bootstrap';
+import Button from '../common/Button';
 
 
 var Game = React.createClass({
@@ -222,7 +223,8 @@ var Game = React.createClass({
   handleClick(e){
     if(this.isDisplaying()) return;
     var position = e.target.id;
-    if(!position) return;
+    var isColored = e.target.style.backgroundColor;
+    if(!position || isColored) return;
     this.checkAnswer(position);
   },
   checkAnswer(position){
@@ -262,7 +264,7 @@ var Game = React.createClass({
       this.setState({
         targetDisplayed: this.state.targetDisplayed
       });
-    }, 10);
+    }, 100);
   },
   getButton(){
     var divStyle = {
@@ -282,18 +284,15 @@ var Game = React.createClass({
       buttonStyleRed.color = 'red';
       return (
         <div style={divStyle}>
-          <Button style={buttonStyleRed} onClick={this.startTrials} > 게임 시작 </Button>
+          <Button style={buttonStyleRed} onClick={this.startTrials} >
+            {this.state.practiceDone ? '게임 시작' : '연습 시작'}
+          </Button>
         </div>
       );
     }
     // end of trials set
     else if(this.isTrialsDone()){
-      var button;
-      if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-        button = <Button style={buttonStyle} onTouchStart={this.startTrials} > 다음 게임 </Button>;
-      }else{
-        button = <Button style={buttonStyle} onClick={this.startTrials} > 다음 게임 </Button>;
-      }
+      var button = <Button style={buttonStyle} onClick={this.startTrials} > 다음 게임 </Button>;
       return <div style={divStyle}> {button} </div>;
     }
     return;
@@ -344,7 +343,7 @@ var Game = React.createClass({
         display: 'block',
         position: 'absolute'
       }} >
-      {guide.map(s => (<div>{s}</div>))}
+      {guide.map((s, i) => (<div key={i}>{s}</div>))}
     </span>
     );
   },

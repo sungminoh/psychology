@@ -7,7 +7,8 @@ import ColorGrid from './ColorGrid';
 import ResponseButton from './ResponseButton';
 import distinctColors from 'distinct-colors';
 import { random, makeUrl, toHex, genSeq, genPallet, randomColorPos } from '../helpers';
-import { Button, Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col } from 'react-bootstrap';
+import Button from '../common/Button';
 
 
 var Game = React.createClass({
@@ -194,7 +195,7 @@ var Game = React.createClass({
           <Button
             style={{width:'100%', height:'100%', fontSize: this.state.responseHeight/2, color: 'red'}}
             onClick={this.nextGame} >
-            게임 시작
+            {this.state.practiceDone ? '게임 시작' : '연습 시작'}
           </Button>
         </div>
       );

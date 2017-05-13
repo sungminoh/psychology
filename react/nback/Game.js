@@ -6,7 +6,8 @@ import Result from './Result';
 import ResponseButton from './ResponseButton';
 import distinctColors from 'distinct-colors';
 import { clone, random, makeUrl, genNBackSeq, setAttrByObj } from '../helpers';
-import { Button, Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col } from 'react-bootstrap';
+import Button from '../common/Button';
 
 
 var Game = React.createClass({
@@ -231,25 +232,22 @@ var Game = React.createClass({
       buttonStyleRed.color = 'red';
       return (
         <div style={divStyle}>
-          <Button style={buttonStyleRed} onClick={this.startTrials} > 게임 시작 </Button>
+          <Button style={buttonStyleRed} onClick={this.startTrials}>
+            {this.state.practiceDone ? '게임 시작' : '연습 시작'}
+          </Button>
         </div>
       );
     }
     // end of trials set
     else if(this.isTrialsDone()){
-      var button;
-      if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-        button = <Button style={buttonStyle} onTouchStart={this.startTrials} > 다음 게임 </Button>;
-      }else{
-        button = <Button style={buttonStyle} onClick={this.startTrials} > 다음 게임 </Button>;
-      }
+      var button = <Button style={buttonStyle} onClick={this.startTrials}>다음 게임</Button>
       return <div style={divStyle}> {button} </div>;
     }
     // before N (this current trial is an introduction)
     else if(this.isBeforeN()){
       return (
         <div style={divStyle}>
-          <Button style={buttonStyle} value='next' onClick={this.nextNumber}> 다음 </Button>
+          <Button style={buttonStyle} value='next' onClick={this.nextNumber}>다음</Button>
         </div>
       );
     }

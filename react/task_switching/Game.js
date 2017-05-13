@@ -7,7 +7,8 @@ import Result from './Result';
 import ResponseButton from './ResponseButton';
 import distinctColors from 'distinct-colors';
 import { random, makeUrl, genMaintains, genSwitchSeq, genNumbers } from '../helpers';
-import { Button, Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col } from 'react-bootstrap';
+import Button from '../common/Button';
 
 var possibles = [1,2,3,4,6,7,8,9];
 
@@ -126,7 +127,7 @@ var Game = React.createClass({
           <Button
             style={{width:'100%', height:'100%', fontSize: this.state.responseHeight/2, color: 'red'}}
             onClick={this.nextGame} >
-            게임 시작
+            {!this.state.countdown? '게임 시작' : '연습 시작'}
           </Button>
         </div>
       );

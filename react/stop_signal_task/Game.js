@@ -8,7 +8,8 @@ import Target from './Target'
 import ResponseButton from './ResponseButton';
 import distinctColors from 'distinct-colors';
 import { random, makeUrl, toHex, genSeq, genStopSeq } from '../helpers';
-import { Button, Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col } from 'react-bootstrap';
+import Button from '../common/Button';
 
 
 var locations = ['left', 'right'];
@@ -203,7 +204,7 @@ var Game = React.createClass({
           <Button
             style={{width:'100%', height:'100%', fontSize: this.state.responseHeight/2, color: 'red'}}
             onClick={this.nextGame} >
-            게임 시작
+            {this.state.practiceDone ? '게임 시작' : '연습 시작'}
           </Button>
         </div>
       );
@@ -227,19 +228,8 @@ var Game = React.createClass({
     }
   },
   getNextGameButton(){
-    if(this.state.beforeNext){
-      var button;
-      if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-        button = (
-          <Button
-            style={{width:'100%', height:'100%', fontSize: this.state.responseHeight/2}}
-            onTouchStart={this.nextGame}
-          >
-            다음 게임
-          </Button>
-        );
-      }else{
-        button = (
+    if(this.state.beforeNext && !this.state.practiceDone){
+      var button = (
           <Button
             style={{width:'100%', height:'100%', fontSize: this.state.responseHeight/2}}
             onClick={this.nextGame}
@@ -247,7 +237,6 @@ var Game = React.createClass({
             다음 게임
           </Button>
         );
-      }
       return (
         <div
           style={{

@@ -19,7 +19,8 @@ var GridBoard = React.createClass({
     var baseBrickStyle={
       height: brickSize,
       width: brickSize,
-      margin: 1,
+      margin: 0,
+      border: '1px solid black',
       display: 'inline-block'
     }
     var rows = [];
@@ -42,7 +43,7 @@ var GridBoard = React.createClass({
   },
   render(){
     var specs = this.props.specs;
-    var size = Math.min(specs.height, specs.width);
+    var size = Math.min(specs.height, specs.width) - 10;
     var verticalPadding = (specs.height-size)/2;
     var horizentalPadding = (specs.width-size)/2;
     var gridStyle = {
@@ -53,7 +54,6 @@ var GridBoard = React.createClass({
       paddingLeft: horizentalPadding,
       paddingRight: horizentalPadding,
     }
-
     if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
       return (
         <Grid

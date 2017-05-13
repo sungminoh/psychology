@@ -1,5 +1,6 @@
 import React from 'react';
-import { Form, FormGroup, ControlLabel, FormControl, Button, Row, Grid, Col} from 'react-bootstrap';
+import { Form, FormGroup, ControlLabel, FormControl, Row, Grid, Col} from 'react-bootstrap';
+import Button from '../common/Button';
 
 
 var ResponseButton = React.createClass({
@@ -16,7 +17,6 @@ var ResponseButton = React.createClass({
           value={this.props.value[0]}
           disabled={this.props.disabled}
           onClick={this.props.callback}
-          onTouchStart={this.props.callback}
         >
           {this.props.text[0]}
         </Button>
@@ -25,7 +25,6 @@ var ResponseButton = React.createClass({
           value={this.props.value[1]}
           disabled={this.props.disabled}
           onClick={this.props.callback}
-          onTouchStart={this.props.callback}
         >
           {this.props.text[1]}
         </Button>
