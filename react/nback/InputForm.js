@@ -36,7 +36,7 @@ var InputForm = React.createClass({
   getInitialState() {
     return {
       id: '',
-      isValidId: true,
+      isValidId: false,
       numberOfGames: 12,
       isValidNumberOfGames: true,
       numberOfTrialsPerGame: 12,
