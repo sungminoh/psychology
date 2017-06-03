@@ -5,6 +5,7 @@ import Button from '../common/Button';
 
 var ResponseButton = React.createClass({
   onClickHandler(e){
+    if(this.props.selected != 'none') return;
     this.props.callback(e.target.value);
   },
   render(){
@@ -25,7 +26,7 @@ var ResponseButton = React.createClass({
           id='0'
           style={this.props.selected == this.props.value[0] ? selectedButtonStyle : buttonStyle}
           value={this.props.value[0]}
-          disabled={this.props.selected == this.props.value[1]}
+          disabled={this.props.selected != 'none'}
           onClick={this.onClickHandler}
         >
           {this.props.text[0]}
@@ -34,7 +35,7 @@ var ResponseButton = React.createClass({
           id='1'
           style={this.props.selected == this.props.value[1] ? selectedButtonStyle : buttonStyle}
           value={this.props.value[1]}
-          disabled={this.props.selected == this.props.value[0]}
+          disabled={this.props.selected != 'none'}
           onClick={this.onClickHandler}
         >
           {this.props.text[1]}
