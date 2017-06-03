@@ -159,7 +159,7 @@ var InputForm = React.createClass({
           <FormControl.Feedback/>
         </FormGroup>
         {' '}
-        <FormGroup validationState={this.getValidationState('nbacks')} >
+        <FormGroup validationState={this.getValidationState('isValidNumberOfGames')} >
           <ControlLabel>게임 횟수:</ControlLabel>
           {' '}
           <FormControl
