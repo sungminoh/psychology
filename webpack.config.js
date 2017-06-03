@@ -6,6 +6,7 @@ module.exports = {
 
     output: {
         path: __dirname + '/static/',
+        //path: __dirname + '/templates/',
         filename: 'bundle.js'
     },
 

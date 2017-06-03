@@ -2,8 +2,6 @@
 from flask import Flask, render_template, request, Response, g, jsonify
 from json import loads as parse_json
 # from ast import literal_eval as parse_json
-# import MySQLdb as mdb
-# from db_info import mysql_conf, password
 from pdb import set_trace as bp
 from data.database_manager import DatabaseManager
 from utils.download_manager import DownloadManager
@@ -11,6 +9,7 @@ password = 'psycho'
 
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
+
 
 @app.before_request
 def before_request():

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --hot --host 0.0.0.0",
+    "start": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js  --hot --host 0.0.0.0",
     "test": "webpack --progress --colors --watch",
     "lint": "eslint ./react"
   },
@@ -17,13 +17,14 @@
     "distinct-colors": "^1.0.4",
     "rc-checkbox": "^1.4.3",
     "react": "^15.4.1",
-    "react-dom": "^15.4.1",
     "react-bootstrap": "^0.30.6",
+    "react-dom": "^15.4.1",
     "react-inline-block": "^2.1.0",
     "react-router": "^3.0.0",
     "whatwg-fetch": "^2.0.1"
   },
   "devDependencies": {
+    "babel": "^6.23.0",
     "babel-core": "^6.21.0",
     "babel-loader": "^6.2.10",
     "babel-preset-es2015": "^6.18.0",

@@ -13,22 +13,28 @@ var ResponseButton = React.createClass({
       height: '100%',
       fontSize: this.props.specs.height / 2
     };
+    var selectedButtonStyle = {
+      backgroundColor: 'red',
+      width: '50%',
+      height: '100%',
+      fontSize: this.props.specs.height / 2
+    };
     return(
       <div style={{width:'100%', height:'100%'}}>
         <Button
           id='0'
-          style={buttonStyle}
+          style={this.props.selected == this.props.value[0] ? selectedButtonStyle : buttonStyle}
           value={this.props.value[0]}
-          disabled={this.props.selected == this.props.value[0]}
+          disabled={this.props.selected == this.props.value[1]}
           onClick={this.onClickHandler}
         >
           {this.props.text[0]}
         </Button>
         <Button
           id='1'
-          style={buttonStyle}
+          style={this.props.selected == this.props.value[1] ? selectedButtonStyle : buttonStyle}
           value={this.props.value[1]}
-          disabled={this.props.selected == this.props.value[1]}
+          disabled={this.props.selected == this.props.value[0]}
           onClick={this.onClickHandler}
         >
           {this.props.text[1]}

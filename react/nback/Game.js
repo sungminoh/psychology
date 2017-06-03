@@ -29,6 +29,7 @@ var Game = React.createClass({
       gridHeight: 0,
       gridWidth: 0,
       maxSize: 0,
+      buttonDisabled: true,
     };
   },
   isNotStarted() {
@@ -53,7 +54,7 @@ var Game = React.createClass({
     return this.state.practiceDone;
   },
   isPracticeTrialsDone() {
-    return (this.state.practice && this.state.practiceTrialsDone) || this.state.practiceDone;
+    return this.state.practiceTrialsDone || this.state.practiceDone;
   },
   isBeforeN() {
     return this.state.beforeN;
@@ -69,6 +70,7 @@ var Game = React.createClass({
     this.hitRatio = 0;
     this.expose = 0;
     this.blink = 0;
+    this.waitingBeforeTrial = 0;
     // game information
     this.gameNbackTypes = [];
     this.gameNbackIdx = 0;
@@ -141,6 +143,7 @@ var Game = React.createClass({
     return <CountdownTimer sec={s} onExpired={this.startTrials} />;
   },
   startTrials(){
+    this.clearAllTimeout();
     const afterTimeout = () => {
       this.currentUserAnswers = [];
       this.currentUserReactions = [];
@@ -156,14 +159,18 @@ var Game = React.createClass({
         this.practiceIdx = 0;
       }
       this.setNextState({
-        practiceTrialsDone: false,
-        gameTrialsDone: false,
-        numberDisplay: true,
-        countdown:  false
+        numberDisplay: true
       });
     }
-    this.setState({practiceTrialsDone: false})
-    setTimeout(afterTimeout, 500);
+    this.setState({
+      buttonDisabled: true,
+      beforeN: true,
+      practiceTrialsDone: false,
+      practiceDone: false,
+      gameTrialsDone: false,
+      countdown: false
+    });
+    this.timeoutList.push(setTimeout(afterTimeout, this.blink));
   },
   render(){
     // before start game, get inputs
@@ -227,7 +234,7 @@ var Game = React.createClass({
       fontSize: this.state.responseHeight/2
     }
     // done with all practices
-    if(this.isPracticeDone() || this.isCountdown()){
+    if(this.isCountdown() || this.isPracticeDone()){
       var buttonStyleRed = clone(buttonStyle);
       buttonStyleRed.color = 'red';
       return (
@@ -240,18 +247,14 @@ var Game = React.createClass({
     }
     // end of trials set
     else if(this.isTrialsDone()){
-      var button = <Button style={buttonStyle} onClick={this.startTrials}>다음 게임</Button>
+      var button = <Button style={buttonStyle} disabled={this.state.buttonDisabled} onClick={this.startTrials}>다음 게임</Button>;
+      this.timeoutList.push(setTimeout(x => this.setState({buttonDisabled: false}), this.waitingBeforeTrial));
       return <div style={divStyle}> {button} </div>;
     }
     // before N (this current trial is an introduction)
-    else if(this.isBeforeN()){
-      return (
-        <div style={divStyle}>
-          <Button style={buttonStyle} value='next' onClick={this.nextNumber}>다음</Button>
-        </div>
-      );
-    }
-    else if(this.state.numberDisplay){
+    //else if(this.isBeforeN()){
+    //}
+    else if(!this.isBeforeN()){
       return (
         <div style={divStyle}>
           <ResponseButton
@@ -263,28 +266,24 @@ var Game = React.createClass({
         </div>
       );
     }
-    else{
-      return (
-        <div style={divStyle}>
-          <Button style={buttonStyle} value='next' disabled={true}></Button>
-        </div>
-      );
-    }
   },
-  nextNumber(){
+  clearAllTimeout(){
     // remove all the timeout event
     for(var i in this.timeoutList){
       clearTimeout(this.timeoutList[i]);
-      delete this.timeoutList[i]
+      delete this.timeoutList[i];
     }
     this.timeoutList = [];
+  },
+  nextNumber(){
+    this.clearAllTimeout();
     if(this.isBeforeN()){
       // just move index and check whether it is still before N or not
       if(this.isPractice()) this.practiceIdx ++;
       if(this.isGame()) this.gameIdx ++;
       this.currentUserReactions.push('');
       this.currentUserAnswers.push('');
-      this.setNextState({numberDisplay: false});
+      this.setNextState();
     }
     else{
       this.checkAnswer()
@@ -304,7 +303,7 @@ var Game = React.createClass({
       }
       this.currentUserReactions.push(this.state.selectedReaction);
       this.currentUserAnswers.push(correctness);
-      this.setNextState({numberDisplay: false, selectedReaction: 'none'});
+      this.setNextState({selectedReaction: 'none'});
   },
   setNextState(additionalInfo){
     var state = {};
@@ -330,7 +329,8 @@ var Game = React.createClass({
     }
     // during trials
     if (!(state.practiceTrialsDone || state.gameTrialsDone)){
-      this.timeoutList.push(setTimeout(x => {this.setState({numberDisplay: true})}, this.blink));
+      state.numberDisplay = true;
+      //this.timeoutList.push(setTimeout(x => {this.setState({numberDisplay: true})}, this.blink));
     }
     setAttrByObj(state, additionalInfo, true);
     this.setState(state);
@@ -356,7 +356,7 @@ var Game = React.createClass({
     }else if(this.isPractice()){
       nextType = this.practiceNbackTypes[this.practiceNbackIdx];
     }
-    let guide = ['다음 게임은', `등장하는 숫자가 ${nextType}번 전의 숫자와 같을 때 일치를,`, '그렇지 않을 땐 불일치를 누르세요.'];
+    let guide = ['이번 게임에서는 ', `화면의 숫자가 ${nextType}번 전의 숫자와 같을 때 일치를,`, '그렇지 않을 땐 불일치를 누르세요.'];
     return (<span
       style={{
         fontSize: this.state.maxSize/20,
@@ -413,7 +413,7 @@ var Game = React.createClass({
     }
     // when number dispears, it should check answer and call next number after short blink
     if(prevState.numberDisplay && !this.state.numberDisplay){
-      this.timeoutList.push(setTimeout(this.nextNumber(), this.blink));
+      this.timeoutList.push(setTimeout(this.nextNumber, this.blink));
     }
     this.setWindowSize();
   },

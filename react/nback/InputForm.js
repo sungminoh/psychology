@@ -36,7 +36,7 @@ var InputForm = React.createClass({
   getInitialState() {
     return {
       id: '',
-      isValidId: false,
+      isValidId: true,
       numberOfGames: 12,
       isValidNumberOfGames: true,
       numberOfTrialsPerGame: 12,
@@ -51,8 +51,10 @@ var InputForm = React.createClass({
       isValidHitRatio: true,
       expose: 800,
       isValidExpose: true,
-      blink: 200,
+      blink: 2000,
       isValidBlink: true,
+      waitingBeforeTrial: 8000,
+      isValidWaitingBeforeTrial: true,
     };
   },
 
@@ -127,6 +129,12 @@ var InputForm = React.createClass({
     const parsedValue = parseInt(e.target.value);
     this.setState({isValidBlink: !isNaN(parsedValue) && parsedValue >= 0});
     this.setState({ blink: parsedValue});
+  },
+
+  changeWaitingBeforeTrial(e) {
+    const parsedValue = parseInt(e.target.value);
+    this.setState({isValidWaitingBeforeTrial: !isNaN(parsedValue) && parsedValue >= 0});
+    this.setState({ waitingBeforeTrial: parsedValue});
   },
 
   startGame(){
@@ -252,6 +260,17 @@ var InputForm = React.createClass({
             type='number'
             placeholder={this.state.blink}
             onChange={this.changeBlink}
+          />
+          <FormControl.Feedback/>
+        </FormGroup>
+        {' '}
+        <FormGroup validationState={this.getValidationState('isValidWaitingBeforeTrial')} >
+          <ControlLabel>다음 게임 전 대기 시간:</ControlLabel>
+          {' '}
+          <FormControl
+            type='number'
+            placeholder={this.state.waitingBeforeTrial}
+            onChange={this.changeWaitingBeforeTrial}
           />
           <FormControl.Feedback/>
         </FormGroup>
