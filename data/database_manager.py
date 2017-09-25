@@ -50,7 +50,6 @@ class DatabaseManager(object):
 
     def select(self, table):
         query = sql.select.get(table)
-        print query
         self.cursor.execute(query)
         return helpers.convert_to_float_rec(self.cursor.fetchall())
 
