@@ -14,7 +14,9 @@ headers = {
                          'fixation', 'blink', 'wait', 'timestamp'],
     'nback': ['test_id',
               'game_seq', 'number_seq', 'nback_type', 'number', 'hit', 'user_input', 'correct',
-              'expose', 'blink', 'timestamp']
+              'expose', 'blink', 'timestamp'],
+    'spatial_memory': ['test_id',
+                       'game_seq', 'target_seq', 'position', 'user_trials', 'speed', 'timestamp']
 }
 
 
@@ -29,6 +31,6 @@ class DownloadManager(object):
     def get_csv(table, data):
         header = headers.get(table)
         csv_data = [','.join(header)]
-        csv_data.extend([','.join(str(x) for x in entity) for entity in data])
+        csv_data.extend([','.join('"%s"'%(x) for x in entity) for entity in data])
         csv_text = '\n'.join(csv_data)
         return csv_text

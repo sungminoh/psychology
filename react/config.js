@@ -1,3 +1,3 @@
 module.exports= {
-  base: '/psycho'
+  base: '/cognition'
 }

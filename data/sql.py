@@ -23,7 +23,7 @@ create_tables = ["""
                  expose          INTEGER NOT NULL,
                  blink           INTEGER NOT NULL,
                  inter           INTEGER NOT NULL,
-                 ts              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                 ts              TIMESTAMP DEFAULT (datetime('now', 'localtime'))
                  );
                  ""","""
                  CREATE TABLE mental_rotation(
@@ -35,7 +35,7 @@ create_tables = ["""
                  user_input      TINYINT(1) NOT NULL,
                  correct         TINYINT(1) NOT NULL,
                  delay           INTEGER NOT NULL,
-                 ts              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                 ts              TIMESTAMP DEFAULT (datetime('now', 'localtime'))
                  );
                  ""","""
                  CREATE TABLE task_switching(
@@ -48,7 +48,7 @@ create_tables = ["""
                  user_input      TINYINT(1) NOT NULL,
                  correct         TINYINT(1) NOT NULL,
                  delay           INTEGER NOT NULL,
-                 ts              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                 ts              TIMESTAMP DEFAULT (datetime('now', 'localtime'))
                  );
                  ""","""
                  CREATE TABLE stop_signal_task(
@@ -62,7 +62,7 @@ create_tables = ["""
                  fixation        INTEGER NOT NULL,
                  blink           INTEGER NOT NULL,
                  wait            INTEGER NOT NULL,
-                 ts              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                 ts              TIMESTAMP DEFAULT (datetime('now', 'localtime'))
                  );
                  ""","""
                  CREATE TABLE nback(
@@ -77,7 +77,7 @@ create_tables = ["""
                  correct         TINYINT(1) NOT NULL,
                  expose          INTEGER NOT NULL,
                  blink           INTEGER NOT NULL,
-                 ts              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                 ts              TIMESTAMP DEFAULT (datetime('now', 'localtime'))
                  );
                  ""","""
                  CREATE TABLE spatial_memory(
@@ -88,7 +88,7 @@ create_tables = ["""
                  position        VARCHAR(16) NOT NULL,
                  user_trials     INTEGER NOT NULL,
                  speed           INTEGER NOT NULL,
-                 ts              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                 ts              TIMESTAMP DEFAULT (datetime('now', 'localtime'))
                  )
                  """]
 

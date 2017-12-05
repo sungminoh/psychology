@@ -190,4 +190,4 @@ def result(table):
             return Response(status=403)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
