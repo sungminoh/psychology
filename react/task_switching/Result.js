@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Modal, Button } from 'react-bootstrap';
 import { clone, makeUrl } from '../helpers'
+import { directSave } from '../config';
 
 var TableRow = React.createClass({
   render(){
@@ -180,7 +181,9 @@ var Result = React.createClass({
   },
 
   componentDidMount(){
-    this.sendResult();
+    if(directSave){
+      this.sendResult();
+    }
   }
 });
 

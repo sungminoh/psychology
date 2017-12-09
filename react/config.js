@@ -1,3 +1,4 @@
 module.exports= {
-  base: '/cognition'
+  base: '/cognition',
+  directSave: false
 }
