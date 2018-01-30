@@ -58,7 +58,7 @@ var Selector = React.createClass({
           Task Switching
         </Button>
         <Button value='stop_signal_task' bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
-          Stop Sginal Task
+          Stop Signal Task
         </Button>
         <Button value='nback' bsStyle="primary" bsSize="large" onClick={this.handleClick} block>
           N back
