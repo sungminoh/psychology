@@ -24,14 +24,14 @@ var Target = React.createClass({
         }}
       >
         <Row style={{marginTop: specs.height/4}}>
-          <Col xs={4} style={textStyle}>
-            {this.props.location == 'left' ? 'O' : ''}
+          <Col xs={4} md={4} style={textStyle}>
+            {this.props.location == 'left' ? 'O' : ' '}
           </Col>
-          <Col xs={4} style={stopStyle}>
-            {this.props.stop ? 'O' : ''}
+          <Col xs={4} md={4} style={stopStyle}>
+            {this.props.stop ? 'O' : ' '}
           </Col>
-          <Col xs={4} style={textStyle}>
-            {this.props.location == 'right' ? 'O' : ''}
+          <Col xs={4} md={4} style={textStyle}>
+            {this.props.location == 'right' ? 'O' : ' '}
           </Col>
         </Row>
       </Grid>

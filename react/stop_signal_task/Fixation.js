@@ -21,13 +21,13 @@ var Fixation = React.createClass({
         }}
       >
         <Row style={{marginTop: specs.height/4}}>
-          <Col xs={4} style={textStyle}>
+          <Col xs={4} md={4} style={textStyle}>
             {' '}
           </Col>
-          <Col xs={4} style={textStyle}>
+          <Col xs={4} md={4} style={textStyle}>
             +
           </Col>
-          <Col xs={4} style={textStyle}>
+          <Col xs={4} md={4} style={textStyle}>
             {' '}
           </Col>
         </Row>
